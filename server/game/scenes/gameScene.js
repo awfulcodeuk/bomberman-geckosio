@@ -50,6 +50,10 @@ export class GameScene extends Scene {
     return ++this.playerId
   }
 
+  getState() {
+    return 'hi!'
+  }
+
   create() {
     this.playersGroup = this.add.group()
 
@@ -101,14 +105,6 @@ export class GameScene extends Scene {
         channel.emit('getId', channel.playerId.toString(36))
       })
 
-      channel.on('playerMove', data => {
-        this.playersGroup.children.iterate(player => {
-          if (player.playerId === channel.playerId) {
-            player.setMove(data)
-          }
-        })
-      })
-
       channel.on('addPlayer', data => {
         const x = this.spawnLocations[channel.playerId - 1].x + 32
         const y = this.spawnLocations[channel.playerId - 1].y + 32
@@ -120,6 +116,10 @@ export class GameScene extends Scene {
           channel,
           avatar
         })
+      })
+
+      channel.on('playerMove', data => {
+        this.players.get(channel.id).avatar.setMove(data)
       })
 
       channel.on('dropBomb', dropBomb => {
@@ -146,7 +146,7 @@ export class GameScene extends Scene {
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
-      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.getData('playerAnimFrame') })
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame})
     })
 
     // get an array of all blocks

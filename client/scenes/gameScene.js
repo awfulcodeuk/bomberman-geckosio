@@ -6,7 +6,6 @@ const SI = new SnapshotInterpolation(15) // 15 FPS
 
 const playerVault = new Vault()
 
-import Cursors from '../components/cursors.js'
 import FullscreenButton from '../components/fullscreenButton.js'
 
 // imports for components
@@ -97,7 +96,6 @@ export default class GameScene extends Scene {
 
 
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
-    new Cursors(this, this.channel)
 
     FullscreenButton(this)
 
@@ -171,6 +169,8 @@ export default class GameScene extends Scene {
       down: this.cursors.down.isDown
     }
     
+    this.channel.emit('playerMove', movement)
+
     state.forEach(avatar => {
       const exists = this.avatars.has(avatar.id)
       if (!exists) {
@@ -194,8 +194,6 @@ export default class GameScene extends Scene {
     //this.clientPrediction(movement)
 
     //this.serverReconciliation(movement)
-    
-    this.channel.emit('playerMove', movement)
 
     if (this.bombKey.isDown && !this.bombCoolDown) {
       this.bombCoolDown = true
@@ -204,4 +202,55 @@ export default class GameScene extends Scene {
       setTimeout(() => this.bombCoolDown = false, 1000)
     }
   }
+  
+serverReconciliation = (movement) => {
+  const { left, up, right, down } = movement
+  const player = this.avatars.get(this.socket.id).avatar
+
+  if (player) {
+    // get the latest snapshot from the server
+    const serverSnapshot = SI.vault.get()
+
+    // get the closest player snapshot that matches the server snapshot time
+    const playerSnapshot = playerVault.get(serverSnapshot.time, true)
+
+    if (serverSnapshot && playerSnapshot) {
+      // get the current player position on the server
+      const serverPos = serverSnapshot.state.players.filter(s => s.id === this.socket.id)[0]
+      
+      // calculate the offset between server and client
+      const offsetX = playerSnapshot.state[0].x - serverPos.x
+      const offsetY = playerSnapshot.state[0].y - serverPos.y
+
+      // check if the player is currently on the move
+      const isMoving = left || up || right || down
+
+      // we correct the position faster if the player moves
+      const correction = isMoving ? 10 : 30
+
+      // apply a step by step correction of the player's position
+      player.x -= offsetX / correction
+      player.y -= offsetY / correction
+    }
+  }
+}
+
+clientPrediction = (movement) => {
+  const { left, up, right, down } = movement
+  const speed = 64
+  const player = this.avatars.get(this.socket.id).avatar
+
+  if (player) {
+    if (movement.left) player.setVelocityX(-speed)
+    else if (movement.right) player.setVelocityX(speed)
+    else player.setVelocityX(0)
+    if (movement.up) player.setVelocityY(-speed)
+    else if (movement.down) player.setVelocityY(speed)
+    else player.setVelocityY(0)
+    playerVault.add(
+      SI.snapshot.create([{ id: this.socket.id, x: player.x, y: player.y }])
+    ) 
+    this.playerAnimation(player)
+  }
+}
 }

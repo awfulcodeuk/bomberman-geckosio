@@ -26,7 +26,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.playerID = playerID
     
     this.move = {}
-    this.animFrame = ''
+    this.animFrame = 'p' + this.playerID + '_stand'
 
     this.prevNoMovement = true
 
@@ -51,18 +51,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0)
   }
 
-  setMove(data) {
-    let int = parseInt(data, 36)
-
-    let move = {
-      left: int === 1 || int === 5,
-      right: int === 2 || int === 6,
-      up: int === 4 || int === 6 || int === 5,
-      down: int === 8,
-      none: int === 9
-    }
-
+  setMove(move) {
     this.move = move
+  }
+
+  setAnimFrame(playerAnimFrame) {
+    this.animFrame = playerAnimFrame
   }
 
   update() {
@@ -77,23 +71,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const playerPrefix = 'p' + this.playerID
     
     let playerAnimFrame = ''
-    if (this.velocityY <  0 ) { 
+    if (this.body.velocity.y <  0 ) { 
       playerAnimFrame = playerPrefix + '_walk_up'
-    } else if (this.velocityY >  0 ) {
+    } else if (this.body.velocity.y >  0 ) {
       playerAnimFrame = playerPrefix + '_walk_down'
-    } else if (this.velocityX <  0 ) {
+    } else if (this.body.velocity.x <  0 ) {
       playerAnimFrame = playerPrefix + '_walk_left'
-    } else if (this.velocityX>  0 ) {
+    } else if (this.body.velocity.x >  0 ) {
       playerAnimFrame = playerPrefix + '_walk_right'
     } else {
       playerAnimFrame = playerPrefix + '_stand'
     }
-    this.animFrame = playerAnimFrame
-  }
-
-  postUpdate() {
-    this.prevX = this.x
-    this.prevY = this.y
-    this.prevDead = this.dead
+    
+    this.setAnimFrame(playerAnimFrame)
   }
 }

@@ -15,6 +15,8 @@ const server = http.createServer(app)
 const game = new PhaserGame(server)
 const port = 1444
 
+// TODO: Add helmet
+
 app.use(cors())
 
 app.use('/', express.static(path.join(__dirname, '../client')))
