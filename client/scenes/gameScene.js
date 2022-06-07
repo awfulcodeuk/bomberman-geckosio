@@ -198,7 +198,7 @@ export default class GameScene extends Scene {
     if (this.bombKey.isDown && !this.bombCoolDown) {
       this.bombCoolDown = true
       const droppingPlayer = this.avatars.get(this.channel.id).avatar
-      this.channel.emit('dropBomb', {x: droppingPlayer.x, y: droppingPlayer.y})
+      this.channel.emit('dropBomb')
       setTimeout(() => this.bombCoolDown = false, 1000)
     }
   }

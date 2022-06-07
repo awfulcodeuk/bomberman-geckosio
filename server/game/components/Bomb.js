@@ -1,19 +1,16 @@
 
-import Explosion from '../entities/Explosion.js'
+import Explosion from './Explosion.js'
 
 export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, frame, serverMode } = data
+    let { scene, x, y } = data
 
     // align bombs to grid
     if (x % 64) x = Math.floor(x / 64) * 64 + 32
     if (y % 64) y = Math.floor(y / 64) * 64 + 32
 
-    if (serverMode) {
-      super(scene, x , y, '')
-    } else {
-      super(scene, x , y, frame)
-    }
+    super(scene, x , y)
+
     
     scene.add.existing(this)
     scene.physicsBombs.add(this)
@@ -23,11 +20,14 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.bombRange = 2
 
     this.isExploding = false
-    setTimeout(() => this.explode(), 500)
+    // use this for triggering the explosion
+    this.bombCountdown = this.scene.time.delayedCall(3000, this.explode, [], this)
   }
 
   explode() {
     this.isExploding = true
+    if (typeof(this.bombCountdown) != 'undefined') this.bombCountdown.destroy()
+    
     let checkSpriteArr = []
     let explosionNorthBlockedAt = this.bombRange + 1
     let explosionEastBlockedAt = this.bombRange + 1

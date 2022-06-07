@@ -21,7 +21,7 @@ const __dirname = dirname(__filename)
 // imports for components
 import Player from '../components/Player.js'
 import Block from '../components/Block.js'
-import Bomb from '../components/Block.js'
+import Bomb from '../components/Bomb.js'
 import Explosion from '../components/Explosion.js'
 
 // imports for stages
@@ -123,13 +123,17 @@ export class GameScene extends Scene {
       })
 
       channel.on('dropBomb', dropBomb => {
-        const player = this.players.get(channel.id)
-        const bombEntity = new Bomb({scene: this, x: player.avatar.x, y: player.avatar.y, serverMode: true})
-        const bombID = this.bombs.size
-        this.bombs.set(bombID, {
-          bombID,
-          bombEntity
-        })
+        const player = this.players.get(channel.id).avatar
+        if (player.currentLaidBombs <= player.maxBombs ) {
+          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y})
+          const bombID = this.bombs.size
+          this.bombs.set(bombID, {
+            bombID,
+            bombEntity
+          })
+          player.addCurrentLaidBomb()
+          console.log(player.currentLaidBombs)
+        }
       })
 
       channel.emit('ready')
@@ -146,7 +150,7 @@ export class GameScene extends Scene {
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
-      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame})
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs})
     })
 
     // get an array of all blocks

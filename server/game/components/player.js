@@ -15,28 +15,26 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.scene = scene
 
-    this.prevX = -1
-    this.prevY = -1
+    this.bombRange = 2
+    this.maxBombs = 1
+    this.currentLaidBombs = 0
 
     this.speed = 64
 
     this.dead = false
-    this.prevDead = false
 
     this.playerID = playerID
     
     this.move = {}
     this.animFrame = 'p' + this.playerID + '_stand'
 
-    this.prevNoMovement = true
-
     scene.events.on('update', this.update, this)
   }
 
   hitWithExplosion() {
     this.processingDamage = true
-    // only actually do anything if it's a "b" breakable block
-
+    this.kill()
+    console.log('killed: ' + this.playerID)
   }
 
   kill() {
@@ -44,19 +42,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setActive(false)
   }
 
-  revive(playerId, dummy) {
-    this.playerId = playerId
-    this.dead = false
-    this.setActive(true)
-    this.setVelocity(0)
-  }
-
   setMove(move) {
     this.move = move
   }
 
+  addCurrentLaidBomb() {
+    this.currentLaidBombs++
+  }
+
+  clearCurrentLaidBomb() {
+    this.currentLaidBombs--
+  }
+
   setAnimFrame(playerAnimFrame) {
     this.animFrame = playerAnimFrame
+  }
+
+  setMaxBombs(newMaxBombs) {
+    this.maxBombs = newMaxBombs
+  }
+
+  setBombPower(newBombPower) {
+    this.bombPower = newBombPower
   }
 
   update() {

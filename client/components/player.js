@@ -14,8 +14,27 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setBounce(0)
     this.body.setCollideWorldBounds()
 
+    this.bombRange = 2
+    this.maxBombs = 1
+    this.currentLaidBombs = 0
     
     this.processingDamage = false
+  }
+
+  setMaxBombs(newMaxBombs) {
+    this.maxBombs = newMaxBombs
+  }
+
+  setBombPower(newBombPower) {
+    this.bombPower = newBombPower
+  }
+
+  addCurrentLaidBomb() {
+    this.currentLaidBombs++
+  }
+
+  clearCurrentLaidBomb() {
+    this.currentLaidBombs--
   }
 
   hitWithExplosion() {

@@ -3,17 +3,9 @@ import Explosion from '../entities/Explosion.js'
 
 export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, frame, serverMode } = data
+    let { scene, x, y, frame,  } = data
 
-    // align bombs to grid
-    if (x % 64) x = Math.floor(x / 64) * 64 + 32
-    if (y % 64) y = Math.floor(y / 64) * 64 + 32
-
-    if (serverMode) {
-      super(scene, x , y, '')
-    } else {
-      super(scene, x , y, frame)
-    }
+    super(scene, x , y, frame)
     
     scene.add.existing(this)
     scene.physicsBombs.add(this)
