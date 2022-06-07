@@ -1,10 +1,8 @@
-import Phaser from 'phaser'
-
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, channelId, x, y) {
-    super(scene, x, y, 'player')
-
-    this.channelId = channelId
+  constructor(scene, playerID, x, y, frame) {
+    super(scene, x, y, frame)
+    
+    this.playerID = playerID
 
     this.setOrigin(0.7,0.9)
         

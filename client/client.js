@@ -1,6 +1,7 @@
 //// <reference path="../phaser.d.ts" />
 
 import Phaser, { Game } from 'phaser'
+
 import BootScene from './scenes/bootScene.js'
 import GameScene from './scenes/gameScene.js'
 import FullScreenEvent from './components/fullscreenEvent.js'

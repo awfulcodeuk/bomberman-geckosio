@@ -1,10 +1,16 @@
 import { Scene } from 'phaser'
 import axios from 'axios'
-import Player from '../components/player.js'
+
+import { SnapshotInterpolation, Vault } from '@geckos.io/snapshot-interpolation'
+const SI = new SnapshotInterpolation(15) // 15 FPS
+
+const playerVault = new Vault()
+
 import Cursors from '../components/cursors.js'
 import FullscreenButton from '../components/fullscreenButton.js'
 
 // imports for components
+import Player from '../components/Player.js'
 import Block from '../components/Block.js'
 import Bomb from '../components/Block.js'
 import Explosion from '../components/Explosion.js'
@@ -12,8 +18,13 @@ import Explosion from '../components/Explosion.js'
 export default class GameScene extends Scene {
   constructor() {
     super({ key: 'GameScene' })
-    this.objects = {}
     this.playerId
+    
+    this.avatars = new Map()
+    this.blocks = new Map()
+    this.bombs = new Map()
+
+    this.bombCoolDown = false
   }
 
   init({ channel }) {
@@ -59,7 +70,7 @@ export default class GameScene extends Scene {
     this.load.animation('explosion_west_end_anim', '../assets/explosion_west_end_anim.json')
   }
 
-  async create() {
+  create() {
     this.physics.world.setBounds(64, 64, 704, 768)
     // create physics groups
     this.physicsBlocks = this.physics.add.staticGroup()
@@ -72,59 +83,30 @@ export default class GameScene extends Scene {
 
     this.add.sprite(0,0,'background').setScale(2)
 
+    this.channel.on('snapshot', snapshot => {
+      SI.snapshot.add(snapshot)
+    })
+    
+    this.input.mouse.disableContextMenu()
+
+    
+    this.physics.add.collider(this.physicsAvatars,this.physicsBlocks,function (avatar,block) {
+      //console.log('block x: ' + block.x + ' y: ' + block.y)
+      //console.log('avatar x: ' + avatar.x + ' y: ' + avatar.y)
+    })
+
+
+    this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
     new Cursors(this, this.channel)
 
     FullscreenButton(this)
 
-    const parseUpdates = updates => {
-      if (typeof updates === undefined || updates === '') return []
-
-      // parse
-      let u = updates.split(',')
-      u.pop()
-
-      let u2 = []
-
-      u.forEach((el, i) => {
-        if (i % 4 === 0) {
-          u2.push({
-            playerId: u[i + 0],
-            x: parseInt(u[i + 1], 36),
-            y: parseInt(u[i + 2], 36),
-            dead: parseInt(u[i + 3]) === 1 ? true : false
-          })
-        }
-      })
-      return u2
-    }
-
-    const updatesHandler = updates => {
-      updates.forEach(gameObject => {
-        const { playerId, x, y, dead } = gameObject
-        const alpha = dead ? 0 : 1
-
-        if (Object.keys(this.objects).includes(playerId)) {
-          // if the gameObject does already exist,
-          // update the gameObject
-          let sprite = this.objects[playerId].sprite
-          sprite.setAlpha(alpha)
-          sprite.setPosition(x, y)
-        } else {
-          // if the gameObject does NOT exist,
-          // create a new gameObject
-          let newGameObject = {
-            sprite: new Player(this, playerId, x || 200, y || 200),
-            playerId: playerId
-          }
-          newGameObject.sprite.setAlpha(alpha)
-          this.objects = { ...this.objects, [playerId]: newGameObject }
-        }
-      })
-    }
-
-    this.channel.on('updateObjects', updates => {
-      let parsedUpdates = parseUpdates(updates[0])
-      updatesHandler(parsedUpdates)
+    this.channel.emit('getId')
+    
+    this.channel.on('getId', playerId36 => {
+      this.playerId = parseInt(playerId36, 36)
+      console.log(this.playerId)
+      this.channel.emit('addPlayer')
     })
 
     this.channel.on('removePlayer', playerId => {
@@ -135,21 +117,91 @@ export default class GameScene extends Scene {
         console.error(error.message)
       }
     })
+  }
 
-    try {
-      let res = await axios.get(`${location.protocol}//${location.hostname}:1444/getState`)
+  update() {
+    this.channel.on('tooManyPlayers', playerCount => {
+      console.log('Too many players already: ' + playerCount)
+    })
+    const snap = SI.calcInterpolation('x y', 'players')
+    const blockSnap = SI.calcInterpolation('x y', 'blocks')
+    const bombSnap = SI.calcInterpolation('x y', 'bombs')
 
-      let parsedUpdates = parseUpdates(res.data.state)
-      updatesHandler(parsedUpdates)
+    if (!snap  || !blockSnap || !bombSnap) return
 
-      this.channel.on('getId', playerId36 => {
-        this.playerId = parseInt(playerId36, 36)
-        this.channel.emit('addPlayer')
-      })
+    const { state } = snap
+    const blockState = blockSnap.state
+    const bombState = bombSnap.state
+    
+    if (!state || !blockState || !bombState) return
 
-      this.channel.emit('getId')
-    } catch (error) {
-      console.error(error.message)
+    blockState.forEach(block => {
+      const exists = this.blocks.has(block.id)
+
+      if (!exists) {
+        const _block = new Block({scene: this, x: block.x, y: block.y, blockType: block.blockType, blockID: block.id})
+        this.blocks.set(block.id, 
+          { block: _block }
+          )
+      } else {
+        const _block = this.blocks.get(block.id).block
+        _block.setX(block.x)
+        _block.setY(block.y)
+      }
+    })
+
+    bombState.forEach(bomb => {
+      const exists = this.bombs.has(bomb.id)
+
+      if (!exists) {
+        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular'})
+        this.bombs.set(bomb.id, 
+          { bomb: _bomb }
+          )
+        _bomb.anims.play('bomb_regular_lit', true)
+      } else {
+        const _bomb = this.bombs.get(bomb.id).bomb
+      }
+    })
+
+    const movement = {
+      left: this.cursors.left.isDown,
+      right: this.cursors.right.isDown,
+      up: this.cursors.up.isDown,
+      down: this.cursors.down.isDown
+    }
+    
+    state.forEach(avatar => {
+      const exists = this.avatars.has(avatar.id)
+      if (!exists) {
+        const frame = 'player_' + avatar.playerNumber
+        const _avatar = new Player(this, avatar.playerNumber, avatar.x, avatar.y, frame)
+        _avatar.setX(avatar.x)
+        _avatar.setY(avatar.y)
+        _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
+        this.avatars.set(avatar.id, { avatar: _avatar })
+      } else {
+        //if (avatar.id != this.socket.id) {
+          const _avatar = this.avatars.get(avatar.id).avatar
+          _avatar.setX(avatar.x)
+          _avatar.setY(avatar.y)
+          _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
+          _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
+        //}
+      }
+    })
+
+    //this.clientPrediction(movement)
+
+    //this.serverReconciliation(movement)
+    
+    this.channel.emit('playerMove', movement)
+
+    if (this.bombKey.isDown && !this.bombCoolDown) {
+      this.bombCoolDown = true
+      const droppingPlayer = this.avatars.get(this.channel.id).avatar
+      this.channel.emit('dropBomb', {x: droppingPlayer.x, y: droppingPlayer.y})
+      setTimeout(() => this.bombCoolDown = false, 1000)
     }
   }
 }

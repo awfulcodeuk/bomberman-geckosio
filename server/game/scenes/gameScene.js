@@ -4,10 +4,12 @@ import { iceServers } from '@geckos.io/server'
 import pkg from 'phaser'
 const { Scene } = pkg
 
+import { SnapshotInterpolation } from '@geckos.io/snapshot-interpolation'
+const SI = new SnapshotInterpolation()
+
 import path from 'path'
 import fs from 'fs'
 
-import { Player } from '../components/player.js'
 
 // dir and filenames
 import { fileURLToPath } from 'url'
@@ -17,6 +19,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 // imports for components
+import Player from '../components/Player.js'
 import Block from '../components/Block.js'
 import Bomb from '../components/Block.js'
 import Explosion from '../components/Explosion.js'
@@ -44,21 +47,7 @@ export class GameScene extends Scene {
   }
 
   getId() {
-    return this.playerId++
-  }
-
-  prepareToSync(player) {
-    return `${player.playerId},${Math.round(player.x).toString(36)},${Math.round(player.y).toString(36)},${
-      player.dead === true ? 1 : 0
-    },`
-  }
-
-  getState() {
-    let state = ''
-    this.playersGroup.children.iterate(player => {
-      state += this.prepareToSync(player)
-    })
-    return state
+    return ++this.playerId
   }
 
   create() {
@@ -121,12 +110,26 @@ export class GameScene extends Scene {
       })
 
       channel.on('addPlayer', data => {
-        let dead = this.playersGroup.getFirstDead()
-        if (dead) {
-          dead.revive(channel.playerId, false)
-        } else {
-          this.playersGroup.add(new Player(this, channel.playerId, Phaser.Math.RND.integerInRange(100, 700)))
-        }
+        const x = this.spawnLocations[channel.playerId - 1].x + 32
+        const y = this.spawnLocations[channel.playerId - 1].y + 32
+        const avatar = new Player(this, channel.playerId, x, y)
+        avatar.setData({playerAnimFrame: 'p' + avatar.playerID + '_stand'})
+        this.playersGroup.add(avatar)
+        
+        this.players.set(channel.id, {
+          channel,
+          avatar
+        })
+      })
+
+      channel.on('dropBomb', dropBomb => {
+        const player = this.players.get(channel.id)
+        const bombEntity = new Bomb({scene: this, x: player.avatar.x, y: player.avatar.y, serverMode: true})
+        const bombID = this.bombs.size
+        this.bombs.set(bombID, {
+          bombID,
+          bombEntity
+        })
       })
 
       channel.emit('ready')
@@ -134,21 +137,46 @@ export class GameScene extends Scene {
   }
 
   update() {
-    let updates = ''
-    this.playersGroup.children.iterate(player => {
-      let x = Math.abs(player.x - player.prevX) > 0.5
-      let y = Math.abs(player.y - player.prevY) > 0.5
-      let dead = player.dead != player.prevDead
-      if (x || y || dead) {
-        if (dead || !player.dead) {
-          updates += this.prepareToSync(player)
-        }
-      }
-      player.postUpdate()
+    this.tick++
+
+    // only send the update to the client at 15 FPS (save bandwidth)
+    if (this.tick % 4 !== 0) return
+
+    // get an array of all avatars
+    const avatars = []
+    this.players.forEach(player => {
+      const { channel, avatar } = player
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.getData('playerAnimFrame') })
     })
 
-    if (updates.length > 0) {
-      this.io.room().emit('updateObjects', [updates])
+    // get an array of all blocks
+    const blocksArr = []
+    this.blocks.forEach(block => {
+      const { blockID, blockEntity } = block
+      blocksArr.push({ id: blockID, x: blockEntity.x, y: blockEntity.y, blockType: blockEntity.blockType })
+    })
+
+    // get an array of all bombs
+    const bombsArr = []
+    this.bombs.forEach(bomb => {
+      const { bombID, bombEntity } = bomb
+      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y })
+    })
+        
+    const worldState = {
+      players: avatars,
+      blocks: blocksArr,
+      bombs: bombsArr
     }
+
+    const snapshot = SI.snapshot.create(worldState)
+    SI.vault.add(snapshot)
+
+    // send all avatars and blocks to all players
+    this.players.forEach(player => {
+      const { channel } = player
+      channel.emit('snapshot', snapshot)
+    })
+
   }
 }

@@ -1,5 +1,5 @@
-export class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, playerId, x = 200, y = 200, dummy = false) {
+export default class Player extends Phaser.Physics.Arcade.Sprite {
+  constructor(scene, playerID, x, y) {
     super(scene, x, y, '')
 
     this.setOrigin(0.7,0.9)
@@ -23,16 +23,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.dead = false
     this.prevDead = false
 
-    this.playerId = playerId
+    this.playerID = playerID
+    
     this.move = {}
-
-    this.setDummy(dummy)
-
-    this.body.setSize(32, 48)
+    this.animFrame = ''
 
     this.prevNoMovement = true
-
-    this.setCollideWorldBounds(true)
 
     scene.events.on('update', this.update, this)
   }
@@ -41,18 +37,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.processingDamage = true
     // only actually do anything if it's a "b" breakable block
 
-  }
-  
-  setDummy(dummy) {
-    if (dummy) {
-      this.body.setBounce(1)
-      this.scene.time.addEvent({
-        delay: Phaser.Math.RND.integerInRange(45, 90) * 1000,
-        callback: () => this.kill()
-      })
-    } else {
-      this.body.setBounce(0)
-    }
   }
 
   kill() {
@@ -64,7 +48,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.playerId = playerId
     this.dead = false
     this.setActive(true)
-    this.setDummy(dummy)
     this.setVelocity(0)
   }
 
@@ -89,7 +72,23 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (this.move.up) this.setVelocityY(-this.speed)
     else if (this.move.down) this.setVelocityY(this.speed)
-    else this.setVelocityY(0)
+    else this.setVelocityY(0)          
+    
+    const playerPrefix = 'p' + this.playerID
+    
+    let playerAnimFrame = ''
+    if (this.velocityY <  0 ) { 
+      playerAnimFrame = playerPrefix + '_walk_up'
+    } else if (this.velocityY >  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_down'
+    } else if (this.velocityX <  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_left'
+    } else if (this.velocityX>  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_right'
+    } else {
+      playerAnimFrame = playerPrefix + '_stand'
+    }
+    this.animFrame = playerAnimFrame
   }
 
   postUpdate() {
