@@ -35,6 +35,10 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
     this.processingDamage = true
     // only actually do anything if it's a "b" breakable block
     if (this.blockType === 'b') {
+      console.log(this.blockID)
+      console.log(this.blockType)
+      console.log(this.x)
+      console.log(this.y)
       this.destroy()
     }
   }

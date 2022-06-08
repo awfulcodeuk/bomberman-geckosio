@@ -31,7 +31,7 @@ export class GameScene extends Scene {
     super({ key: 'GameScene' })
     this.playerId = 0
     this.tick = 0
-    this.blockID = 0
+    this.blockIDCounter = 0
     this.players = new Map()
     this.blocks = new Map()
     this.bombs = new Map()
@@ -66,19 +66,17 @@ export class GameScene extends Scene {
     // create stage
     let rowCount = 0
     let colCount = 0
-    let blockID = 0
     stageBlocks.forEach(rows => {
       rows.forEach(colEntry => {
+        const blockID = this.blockIDCounter
         // "b" breakable blocks have a tiny chance of not being created. "e" edge and "s" static always are
-        if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.95)) {
-          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: this.blockID})
-          //exit
-          blockID = this.blockID
+        if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.05)) {
+          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: blockID})
           this.blocks.set(blockID, {
             blockID, 
             blockEntity
           })
-          this.blockID++
+          this.blockIDCounter++
         } else if (parseInt(colEntry) >= 1 && parseInt(colEntry) < 100 ) {
           // only values of 1 to 100 will create spawn points
           this.spawnLocations.push({x: (colCount * 64), y: (rowCount * 64)})
