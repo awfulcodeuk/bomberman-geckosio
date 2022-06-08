@@ -16,7 +16,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene
 
     this.bombRange = 2
-    this.maxBombs = 1
+    this.maxBombs = 100
     this.currentLaidBombs = 0
 
     this.speed = 64

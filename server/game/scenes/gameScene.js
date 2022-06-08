@@ -22,7 +22,6 @@ const __dirname = dirname(__filename)
 import Player from '../components/Player.js'
 import Block from '../components/Block.js'
 import Bomb from '../components/Bomb.js'
-import Explosion from '../components/Explosion.js'
 
 // imports for stages
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01.json', 'utf8')))
@@ -36,6 +35,9 @@ export class GameScene extends Scene {
     this.players = new Map()
     this.blocks = new Map()
     this.bombs = new Map()
+    this.explosions = new Map()
+    this.lifetimeBombCount = 0
+    this.lifetimeExplosionCount = 0
     this.spawnLocations = []
   }
 
@@ -56,7 +58,6 @@ export class GameScene extends Scene {
 
   create() {
     this.playersGroup = this.add.group()
-
     this.physics.world.setBounds(64, 64, 704, 768)
     // create physics groups
     this.physicsBlocks = this.physics.add.staticGroup()
@@ -69,7 +70,7 @@ export class GameScene extends Scene {
     stageBlocks.forEach(rows => {
       rows.forEach(colEntry => {
         // "b" breakable blocks have a tiny chance of not being created. "e" edge and "s" static always are
-        if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.05)) {
+        if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.95)) {
           let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: this.blockID})
           //exit
           blockID = this.blockID
@@ -125,14 +126,13 @@ export class GameScene extends Scene {
       channel.on('dropBomb', dropBomb => {
         const player = this.players.get(channel.id).avatar
         if (player.currentLaidBombs <= player.maxBombs ) {
-          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y})
-          const bombID = this.bombs.size
+          const bombID = this.lifetimeBombCount++
+          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID})
           this.bombs.set(bombID, {
             bombID,
             bombEntity
           })
           player.addCurrentLaidBomb()
-          console.log(player.currentLaidBombs)
         }
       })
 
@@ -142,7 +142,6 @@ export class GameScene extends Scene {
 
   update() {
     this.tick++
-
     // only send the update to the client at 15 FPS (save bandwidth)
     if (this.tick % 4 !== 0) return
 
@@ -164,13 +163,21 @@ export class GameScene extends Scene {
     const bombsArr = []
     this.bombs.forEach(bomb => {
       const { bombID, bombEntity } = bomb
-      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y })
+      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isExploded: bombEntity.isExploded })
     })
-        
+
+    // get an array of all explosions
+    const explosionsArr = []
+    this.explosions.forEach(explosion => {
+      const { explosionID, explosionEntity } = explosion
+      explosionsArr.push({ id: explosionID, x: explosionEntity.x, y: explosionEntity.y, frame: explosionEntity.frame })
+    })
+    
     const worldState = {
       players: avatars,
       blocks: blocksArr,
-      bombs: bombsArr
+      bombs: bombsArr,
+      explosions: explosionsArr
     }
 
     const snapshot = SI.snapshot.create(worldState)

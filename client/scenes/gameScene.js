@@ -22,6 +22,7 @@ export default class GameScene extends Scene {
     this.avatars = new Map()
     this.blocks = new Map()
     this.bombs = new Map()
+    this.explosions = new Map()
 
     this.bombCoolDown = false
   }
@@ -124,14 +125,16 @@ export default class GameScene extends Scene {
     const snap = SI.calcInterpolation('x y', 'players')
     const blockSnap = SI.calcInterpolation('x y', 'blocks')
     const bombSnap = SI.calcInterpolation('x y', 'bombs')
-
-    if (!snap  || !blockSnap || !bombSnap) return
+    const explosionSnap = SI.calcInterpolation('x y', 'explosions')
+    
+    if (!snap  || !blockSnap || !bombSnap || !explosionSnap) return
 
     const { state } = snap
     const blockState = blockSnap.state
     const bombState = bombSnap.state
+    const explosionState = explosionSnap.state
     
-    if (!state || !blockState || !bombState) return
+    if (!state || !blockState || !bombState || !explosionState) return
 
     blockState.forEach(block => {
       const exists = this.blocks.has(block.id)
@@ -150,15 +153,20 @@ export default class GameScene extends Scene {
 
     bombState.forEach(bomb => {
       const exists = this.bombs.has(bomb.id)
-
-      if (!exists) {
-        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular'})
+      if (!exists && !bomb.isExploded) {
+        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular', isExploded: bomb.isExploded})
         this.bombs.set(bomb.id, 
           { bomb: _bomb }
           )
         _bomb.anims.play('bomb_regular_lit', true)
       } else {
         const _bomb = this.bombs.get(bomb.id).bomb
+        _bomb.setX(bomb.x)
+        _bomb.setY(bomb.y)
+        _bomb.isExploded = (bomb.isExploded)
+        if (bomb.isExploded) {
+          _bomb.destroy()
+        }
       }
     })
 
@@ -189,6 +197,16 @@ export default class GameScene extends Scene {
           _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
         //}
       }
+    })
+
+    explosionState.forEach(explosionState => {
+      const exists = this.explosions.has(explosionState.id)
+      if (!exists) {
+        const _explosion = new Explosion({scene: this, x: explosionState.x, y: explosionState.y, frame: explosionState.frame})
+        this.explosions.set(explosionState.id, {
+          explosion: _explosion
+        })
+      } 
     })
 
     //this.clientPrediction(movement)
