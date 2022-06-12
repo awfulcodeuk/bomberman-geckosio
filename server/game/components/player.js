@@ -1,5 +1,3 @@
-import { log } from "console"
-
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
     let { scene, x, y, playerID, entityID } = data
@@ -21,7 +19,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.entityID = entityID
     this.bombRange = 2
-    this.maxBombs = 100
+    this.maxBombs = 1
     this.currentLaidBombs = 0
 
     this.speed = 64

@@ -1,0 +1,112 @@
+{
+    "frames": [
+        {
+            "filename": "skull",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 19,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "skates",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 78,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "fire_normal",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 136,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "fire_super",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 197,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "bomb_normal",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 256,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "bomb_super",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 313,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "kick",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 370,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "glove",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 430,
+                "y": 250
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        }
+],
+    "meta": {
+        "description": "Manually created atlas, but the linked tool is still awesome.",
+        "web": "https://gammafp.github.io/atlas-packer-phaser/"
+    }
+}

@@ -43,6 +43,7 @@ export default class GameScene extends Scene {
     this.load.atlas('player_3', '../assets/players_03.png', '../assets/players_03_atlas.json')
     this.load.atlas('player_4', '../assets/players_04.png', '../assets/players_04_atlas.json')
     this.load.atlas('bomb_regular', '../assets/items_effects.png', '../assets/bomb_regular_atlas.json')
+    this.load.atlas('powerups', '../assets/items_effects.png', '../assets/powerups_atlas.json')
     this.load.atlas('explosion_centre', '../assets/items_effects.png', '../assets/explosion_centre_atlas.json')
     this.load.atlas('explosion_north', '../assets/items_effects.png', '../assets/explosion_north_atlas.json')
     this.load.atlas('explosion_north_end', '../assets/items_effects.png', '../assets/explosion_north_end_atlas.json')
@@ -186,6 +187,8 @@ export default class GameScene extends Scene {
         _avatar.setY(avatar.y)
         _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
         this.avatars.set(avatar.id, { avatar: _avatar })
+        
+    this.add.sprite(_avatar.x,_avatar.y,'powerups','glove')
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar
