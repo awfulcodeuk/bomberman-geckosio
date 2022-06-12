@@ -1,5 +1,9 @@
+import { log } from "console"
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, playerID, x, y) {
+  constructor(data) {
+    let { scene, x, y, playerID, entityID } = data
+
     super(scene, x, y, '')
 
     this.setOrigin(0.7,0.9)
@@ -15,7 +19,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.scene = scene
 
-    this.bombRange = 2
+    this.entityID = entityID
+    this.bombRange = 4
     this.maxBombs = 100
     this.currentLaidBombs = 0
 
@@ -50,7 +55,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.currentLaidBombs++
   }
 
-  clearCurrentLaidBomb() {
+  removeCurrentLaidBomb() {
     this.currentLaidBombs--
   }
 

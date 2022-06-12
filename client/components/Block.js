@@ -1,6 +1,6 @@
 export default class Block extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, frame, serverMode, blockType, blockID } = data
+    let { scene, x, y, frame, serverMode, blockType, blockID, isDestroyed } = data
 
     switch (blockType) {
       case "e":
@@ -22,20 +22,25 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
 
     this.blockType = blockType
     this.blockID = blockID
-    this.processingDamage = false
+    this.isDestroyed = isDestroyed
 
     scene.add.existing(this)
-    scene.physicsBlocks.add(this)
-    this.body.setSize(64,64)
-    this.setImmovable()
-
+    if (!this.isDestroyed) {
+      scene.physicsBlocks.add(this)
+      this.body.setSize(64,64)
+      this.setImmovable()
+    } else {
+      this.setVisible(false)
+    }
   }
   
-  hitWithExplosion() {
-    this.processingDamage = true
-    // only actually do anything if it's a "b" breakable block
-    if (this.blockType === 'b') {
-      this.destroy()
+  setDestroyed() {
+    if (!this.isDestroyed) {
+      this.isDestroyed = true
+      this.anims.play('stage_01_block_destroying', true)
+      this.once('animationcomplete', () => {
+        this.setVisible(false)
+      })
     }
   }
 }

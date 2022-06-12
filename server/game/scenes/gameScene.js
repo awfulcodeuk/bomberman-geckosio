@@ -39,6 +39,7 @@ export class GameScene extends Scene {
     this.lifetimeBombCount = 0
     this.lifetimeExplosionCount = 0
     this.spawnLocations = []
+    this.globalEntityID = 0
   }
 
   init() {
@@ -63,6 +64,9 @@ export class GameScene extends Scene {
     this.physicsBlocks = this.physics.add.staticGroup()
     this.physicsAvatars = this.physics.add.group()
     this.physicsBombs = this.physics.add.group()
+    this.explosionColliders = this.physics.add.staticGroup()
+    this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
+    this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
     // create stage
     let rowCount = 0
     let colCount = 0
@@ -71,7 +75,7 @@ export class GameScene extends Scene {
         const blockID = this.blockIDCounter
         // "b" breakable blocks have a tiny chance of not being created. "e" edge and "s" static always are
         if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.05)) {
-          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: blockID})
+          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: blockID, entityID: this.getNewEntityID()})
           this.blocks.set(blockID, {
             blockID, 
             blockEntity
@@ -107,7 +111,7 @@ export class GameScene extends Scene {
       channel.on('addPlayer', data => {
         const x = this.spawnLocations[channel.playerId - 1].x + 32
         const y = this.spawnLocations[channel.playerId - 1].y + 32
-        const avatar = new Player(this, channel.playerId, x, y)
+        const avatar = new Player({scene: this, playerID: channel.playerId, x: x, y: y, entityID: this.getNewEntityID()})
         avatar.setData({playerAnimFrame: 'p' + avatar.playerID + '_stand'})
         this.playersGroup.add(avatar)
         
@@ -125,12 +129,12 @@ export class GameScene extends Scene {
         const player = this.players.get(channel.id).avatar
         if (player.currentLaidBombs <= player.maxBombs ) {
           const bombID = this.lifetimeBombCount++
-          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID})
+          player.addCurrentLaidBomb()
+          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: this.getNewEntityID(), owningPlayer: player, isDestroyed: false})
           this.bombs.set(bombID, {
             bombID,
             bombEntity
           })
-          player.addCurrentLaidBomb()
         }
       })
 
@@ -154,14 +158,14 @@ export class GameScene extends Scene {
     const blocksArr = []
     this.blocks.forEach(block => {
       const { blockID, blockEntity } = block
-      blocksArr.push({ id: blockID, x: blockEntity.x, y: blockEntity.y, blockType: blockEntity.blockType })
+      blocksArr.push({ id: blockID, x: blockEntity.x, y: blockEntity.y, blockType: blockEntity.blockType, isDestroyed: blockEntity.isDestroyed })
     })
 
     // get an array of all bombs
     const bombsArr = []
     this.bombs.forEach(bomb => {
       const { bombID, bombEntity } = bomb
-      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isExploded: bombEntity.isExploded })
+      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isDestroyed: bombEntity.isDestroyed })
     })
 
     // get an array of all explosions
@@ -187,5 +191,9 @@ export class GameScene extends Scene {
       channel.emit('snapshot', snapshot)
     })
 
+  }
+  
+   getNewEntityID() {
+    return this.globalEntityID++
   }
 }

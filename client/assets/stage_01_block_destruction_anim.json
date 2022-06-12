@@ -1,0 +1,36 @@
+{
+    "anims": [
+        {
+            "key": "stage_01_block_destroying",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 6,
+            "frames": [
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_2"
+                },
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_3"
+                },
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_4"
+                },
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_5"
+                },
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_6"
+                },
+                {
+                    "key": "stage_01_block_destruction",
+                    "frame": "stage_01_block_destruction_7"
+                }
+            ]
+        }
+    ]
+}

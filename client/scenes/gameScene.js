@@ -52,6 +52,7 @@ export default class GameScene extends Scene {
     this.load.atlas('explosion_south_end', '../assets/items_effects.png', '../assets/explosion_south_end_atlas.json')
     this.load.atlas('explosion_west', '../assets/items_effects.png', '../assets/explosion_west_atlas.json')
     this.load.atlas('explosion_west_end', '../assets/items_effects.png', '../assets/explosion_west_end_atlas.json')
+    this.load.atlas('stage_01_block_destruction', '../assets/stage_01_block_destruction.png', '../assets/stage_01_block_destruction_atlas.json')
     
 
     this.load.animation('player_1_anim', '../assets/players_01_anim.json')
@@ -68,6 +69,7 @@ export default class GameScene extends Scene {
     this.load.animation('explosion_south_end_anim', '../assets/explosion_south_end_anim.json')
     this.load.animation('explosion_west_anim', '../assets/explosion_west_anim.json')
     this.load.animation('explosion_west_end_anim', '../assets/explosion_west_end_anim.json')
+    this.load.animation('stage_01_block_destruction', '../assets/stage_01_block_destruction_anim.json')
   }
 
   create() {
@@ -90,12 +92,7 @@ export default class GameScene extends Scene {
     this.input.mouse.disableContextMenu()
 
     
-    this.physics.add.collider(this.physicsAvatars,this.physicsBlocks,function (avatar,block) {
-      //console.log('block x: ' + block.x + ' y: ' + block.y)
-      //console.log('avatar x: ' + avatar.x + ' y: ' + avatar.y)
-    })
-
-
+    this.physics.add.collider(this.physicsAvatars,this.physicsBlocks)
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
 
     FullscreenButton(this)
@@ -104,7 +101,6 @@ export default class GameScene extends Scene {
     
     this.channel.on('getId', playerId36 => {
       this.playerId = parseInt(playerId36, 36)
-      console.log(this.playerId)
       this.channel.emit('addPlayer')
     })
 
@@ -140,7 +136,7 @@ export default class GameScene extends Scene {
       const exists = this.blocks.has(block.id)
 
       if (!exists) {
-        const _block = new Block({scene: this, x: block.x, y: block.y, blockType: block.blockType, blockID: block.id})
+        const _block = new Block({scene: this, x: block.x, y: block.y, blockType: block.blockType, blockID: block.id, isDestroyed: block.isDestroyed})
         this.blocks.set(block.id, 
           { block: _block }
           )
@@ -148,13 +144,16 @@ export default class GameScene extends Scene {
         const _block = this.blocks.get(block.id).block
         _block.setX(block.x)
         _block.setY(block.y)
+        if (block.isDestroyed) {
+          _block.setDestroyed()
+        }
       }
     })
 
     bombState.forEach(bomb => {
       const exists = this.bombs.has(bomb.id)
-      if (!exists && !bomb.isExploded) {
-        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular', isExploded: bomb.isExploded})
+      if (!exists) {
+        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular', isDestroyed: bomb.isDestroyed})
         this.bombs.set(bomb.id, 
           { bomb: _bomb }
           )
@@ -163,9 +162,8 @@ export default class GameScene extends Scene {
         const _bomb = this.bombs.get(bomb.id).bomb
         _bomb.setX(bomb.x)
         _bomb.setY(bomb.y)
-        _bomb.isExploded = (bomb.isExploded)
-        if (bomb.isExploded) {
-          _bomb.destroy()
+        if (bomb.isDestroyed) {
+          _bomb.setDestroyed()
         }
       }
     })

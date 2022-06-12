@@ -1,10 +1,10 @@
 export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, bombID } = data
+    let { scene, x, y, bombID, entityID, owningPlayer, isDestroyed } = data
 
     // align bombs to grid
-    if (x % 64) x = Math.floor(x / 64) * 64 + 32
-    if (y % 64) y = Math.floor(y / 64) * 64 + 32
+    x = Math.floor(x / 64) * 64 + 32
+    y = Math.floor(y / 64) * 64 + 32
 
     super(scene, x , y)
     this.scene = scene
@@ -14,10 +14,13 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(64, 64)
     this.body.setImmovable()
 
+    this.entityID = entityID
     this.bombID = bombID
-    this.bombRange = 2
-    this.isExploded = false
+    this.owningPlayer = owningPlayer
+    this.bombRange = this.owningPlayer.bombRange
+    this.isDestroyed = isDestroyed
     this.lifetimeExplosionCount = this.scene.lifetimeExplosionCount
+    this.entitiesToHit = new Map()
     this.avatarsToHit = new Map()
     this.blocksToHit = new Map()
     this.bombsToHit = new Map()
@@ -26,114 +29,99 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   }
 
   hitWithExplosion() {
-    this.bombCountdown.remove()
     this.explode()
   }
 
   explode() {
-    if (this.isExploded === false) {
-      this.isExploded = true
+    if (this.isDestroyed === false) {
+      this.isDestroyed = true
+      this.owningPlayer.removeCurrentLaidBomb()
       this.scene.physicsBombs.remove(this)
       if (typeof(this.bombCountdown) != 'undefined') this.bombCountdown.destroy()
+
+      const blastHorizontal = this.scene.add.sprite(this.x - this.bombRange * 64, this.y)
+      this.scene.explosionColliders.add(blastHorizontal)
+      // not sure why it needs 256 here - fix later
+      blastHorizontal.body.setSize(256 + (64 * this.bombRange * 2), 64)
       
-      let checkSpriteArr = []
+      const blastVertical = this.scene.add.sprite(this.x, this.y - this.bombRange * 64)
+      this.scene.explosionColliders.add(blastVertical)
+      // not sure why it needs 256 here - fix later
+      blastVertical.body.setSize(64, 256 + (64 * this.bombRange * 2))
+
+      this.scene.physics.add.overlap(this.scene.explosionColliders,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
+        const entityType = 'block'
+        this.entitiesToHit.set(hitEntity.entityID, {
+          hitEntity,
+          entityType
+        })
+      }, false, this)
+      this.scene.physics.add.overlap(this.scene.explosionColliders,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
+        const entityType = 'bomb'
+        this.entitiesToHit.set(hitEntity.entityID, {
+          hitEntity,
+          entityType
+        })
+      }, false, this)
+      this.scene.physics.add.overlap(this.scene.explosionColliders,this.scene.physicsAvatars,function(explosionCollider,hitEntity) {
+        const entityType = 'avatar'
+        this.entitiesToHit.set(hitEntity.entityID, {
+          hitEntity,
+          entityType
+        })
+      }, false, this)
+
       let explosionNorthBlockedAt = 100 
       let explosionEastBlockedAt = 100
       let explosionSouthBlockedAt = 100
       let explosionWestBlockedAt = 100
-      let checkSpriteCentre = this.scene.add.sprite(this.x, this.y)
-      this.scene.physics.add.existing(checkSpriteCentre)
-      checkSpriteCentre.body.setSize(60,60)
-      checkSpriteArr.push(checkSpriteCentre)
-      this.scene.physics.add.overlap(checkSpriteCentre,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
-        this.bombsToHit.set(hitEntity.bombID, {
-          hitEntity
-        })
-      }, false, this)
-      for (let i = 1; i <= this.bombRange; i++) {
-        // check north
-        let checkSpriteNorth = this.scene.add.sprite(this.x, this.y - 64 * i)
-        this.scene.physics.add.existing(checkSpriteNorth)
-        checkSpriteNorth.body.setSize(60,60)
-        checkSpriteArr.push(checkSpriteNorth)
-        this.scene.physics.add.overlap(checkSpriteNorth,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
-          this.bombsToHit.set(hitEntity.bombID, {
-            hitEntity
-          })
-        }, false, this)
-        this.scene.physics.add.overlap(checkSpriteNorth,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
-          this.blocksToHit.set(hitEntity.blockID, {
-            hitEntity
-          })
-          // if we have hit a block the explosion is blocked from going further
-          if (typeof hitEntity.blockType !== 'undefined') {
-            explosionNorthBlockedAt = i
-          }
-        }, false, this)
-      // check east
-        let checkSpriteEast = this.scene.add.sprite(this.x + 64 * i, this.y)
-        this.scene.physics.add.existing(checkSpriteEast)
-        checkSpriteEast.body.setSize(60,60)
-        checkSpriteArr.push(checkSpriteEast)
-        this.scene.physics.add.overlap(checkSpriteEast,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
-          this.bombsToHit.set(hitEntity.bombID, {
-            hitEntity
-          })
-        }, false, this)
-        this.scene.physics.add.overlap(checkSpriteEast,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
-          this.blocksToHit.set(hitEntity.blockID, {
-            hitEntity
-          })
-          // if we have hit a block the explosion is blocked from going further
-          if (typeof hitEntity.blockType !== 'undefined') {
-            explosionEastBlockedAt = i
-          }
-        }, false, this)
-        // check south
-        let checkSpriteSouth = this.scene.add.sprite(this.x, this.y + 64 * i)
-        this.scene.physics.add.existing(checkSpriteSouth)
-        checkSpriteSouth.body.setSize(60,60)
-        checkSpriteArr.push(checkSpriteSouth)
-        this.scene.physics.add.overlap(checkSpriteSouth,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
-          this.bombsToHit.set(hitEntity.bombID, {
-            hitEntity
-          })
-        }, false, this)
-        this.scene.physics.add.overlap(checkSpriteSouth,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
-          this.blocksToHit.set(hitEntity.blockID, {
-            hitEntity
-          })
-          // if we have hit a block the explosion is blocked from going further
-          if (typeof hitEntity.blockType !== 'undefined') {
-            explosionSouthBlockedAt = i
-          }
-        }, false, this)
-        // check west
-        let checkSpriteWest = this.scene.add.sprite(this.x - 64 * i, this.y)
-        this.scene.physics.add.existing(checkSpriteWest)
-        checkSpriteWest.body.setSize(60,60)
-        checkSpriteArr.push(checkSpriteWest)
-        this.scene.physics.add.overlap(checkSpriteWest,this.scene.physicsBombs,function(explosionCollider,hitEntity) {
-          this.bombsToHit.set(hitEntity.bombID, {
-            hitEntity
-          })
-        }, false, this)
-        this.scene.physics.add.overlap(checkSpriteWest,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
-          this.blocksToHit.set(hitEntity.blockID, {
-            hitEntity
-          })
-          // if we have hit a block the explosion is blocked from going further
-          if (typeof hitEntity.blockType !== 'undefined') {
-            explosionWestBlockedAt = i
-          }
-        }, false, this)
-      }
-      
+      //console.log('N: ' + explosionNorthBlockedAt + ' E: ' + explosionEastBlockedAt + ' S: ' + explosionSouthBlockedAt + ' W: ' + explosionWestBlockedAt)
       // explosion damage effect only lasts for 20 msec - then destroy all colliders and create explosion entities for the client
       this.scene.time.delayedCall(20, () => {
-        console.log(this.blocksToHit)
-        console.log(this.avatarsToHit)
-        console.log(this.bombsToHit)
+        // establish if explosion is blocked by a block
+        this.entitiesToHit.forEach((entity) => {
+          if (entity.entityType === 'block') {
+            const horizontalDifference = (entity.hitEntity.x - this.x) / 64
+            const verticalDifference = (entity.hitEntity.y - this.y) / 64
+            //console.log('x: ' + entity.hitEntity.x + ' y: ' + entity.hitEntity.y)
+            //console.log('horizontal: ' + horizontalDifference + ' vert: ' + verticalDifference)
+            if (horizontalDifference > 0) {
+              if (horizontalDifference < explosionEastBlockedAt) explosionEastBlockedAt = horizontalDifference
+            } else if (horizontalDifference < 0) {
+              if (Math.abs(horizontalDifference) < explosionWestBlockedAt) explosionWestBlockedAt = Math.abs(horizontalDifference)
+            }
+            if (verticalDifference > 0) {
+              if (verticalDifference < explosionSouthBlockedAt) explosionSouthBlockedAt = verticalDifference
+            } else if (verticalDifference < 0) {
+              if (Math.abs(verticalDifference) < explosionNorthBlockedAt) explosionNorthBlockedAt = Math.abs(verticalDifference)
+            }
+          }
+        })
+        //console.log('N: ' + explosionNorthBlockedAt + ' E: ' + explosionEastBlockedAt + ' S: ' + explosionSouthBlockedAt + ' W: ' + explosionWestBlockedAt)
+        // hit entity if it is not beyond the blockage point
+        
+        this.entitiesToHit.forEach((entity) => {
+          const horizontalDifference = Math.floor((entity.hitEntity.x - this.x) / 64)
+          const verticalDifference = Math.floor((entity.hitEntity.y - this.y) / 64)
+          //console.log('horizontal: ' + horizontalDifference + ' vert: ' + verticalDifference)
+          let explosionBlocked = false
+          if (horizontalDifference > 0) {
+            if (horizontalDifference > explosionEastBlockedAt) explosionBlocked = true
+          } else if (horizontalDifference < 0) {
+            if (Math.abs(horizontalDifference) > explosionWestBlockedAt) explosionBlocked = true
+          }
+          if (verticalDifference > 0) {
+            if (verticalDifference > explosionSouthBlockedAt) explosionBlocked = true
+          } else if (verticalDifference < 0) {
+            if (Math.abs(verticalDifference) > explosionNorthBlockedAt) explosionBlocked = true
+          }
+          if (!explosionBlocked) {
+            //console.log(entity.hitEntity.x + ' ' + entity.hitEntity.y)
+            entity.hitEntity.hitWithExplosion()
+          }
+        })
+
+        // create explosions to send to client for display
         // centre explosion
         const explosionEntity = {x: this.x, y: this.y, frame: 'explosion_centre'}
         const explosionID = this.scene.lifetimeExplosionCount++
@@ -187,10 +175,10 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
             })
           }
         }
-        checkSpriteArr.forEach((checkSprite) => checkSprite.destroy())
+        blastHorizontal.destroy()
+        blastVertical.destroy()
         this.destroy()
       }, [], this)
     }
   }
-  
 }
