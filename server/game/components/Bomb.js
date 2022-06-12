@@ -39,15 +39,23 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
       this.scene.physicsBombs.remove(this)
       if (typeof(this.bombCountdown) != 'undefined') this.bombCountdown.destroy()
 
+      //console.log('bombRange: ' + this.bombRange)
+      //console.log('bombPosition: X: ' + this.x + ' Y: ' + this.y)
       const blastHorizontal = this.scene.add.sprite(this.x - this.bombRange * 64, this.y)
       this.scene.explosionColliders.add(blastHorizontal)
       // not sure why it needs 256 here - fix later
-      blastHorizontal.body.setSize(256 + (64 * this.bombRange * 2), 64)
+      let hx = 64 + (64 * this.bombRange * 4)
+      let hy = 64
+      blastHorizontal.body.setSize(hx , hy)
+      //console.log('horizontal: start x: ' + (this.x - this.bombRange * 64) + ' hx: '+ hx + ' start y: ' + this.y + ' hy: ' + hy)
       
       const blastVertical = this.scene.add.sprite(this.x, this.y - this.bombRange * 64)
       this.scene.explosionColliders.add(blastVertical)
       // not sure why it needs 256 here - fix later
-      blastVertical.body.setSize(64, 256 + (64 * this.bombRange * 2))
+      let vx = 64
+      let vy = 64 + (64 * this.bombRange * 4)
+      blastVertical.body.setSize(vx, vy)
+      //console.log('vertical: start x: ' + this.x + ' vx: '+ vx + ' start y: ' + (this.y - this.bombRange * 64) + ' vy: ' + vy)
 
       this.scene.physics.add.overlap(this.scene.explosionColliders,this.scene.physicsBlocks,function(explosionCollider,hitEntity) {
         const entityType = 'block'
