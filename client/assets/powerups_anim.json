@@ -1,0 +1,24 @@
+{
+    "anims": [
+        {
+            "key": "power_up_border_flashing",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 3,
+            "frames": [
+                {
+                    "key": "power_up_border",
+                    "frame": "power_up_border_1"
+                },
+                {
+                    "key": "power_up_border",
+                    "frame": "power_up_border_2"
+                },
+                {
+                    "key": "power_up_border",
+                    "frame": "power_up_border_3"
+                }
+            ]
+        }
+    ]
+}

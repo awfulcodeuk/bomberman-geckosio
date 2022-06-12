@@ -61,6 +61,7 @@ export default class GameScene extends Scene {
     this.load.animation('player_3_anim', '../assets/players_03_anim.json')
     this.load.animation('player_4_anim', '../assets/players_04_anim.json')
     this.load.animation('bomb_regular_anim', '../assets/bomb_regular_anim.json')
+    this.load.animation('powerups_anim', '../assets/powerups_anim.json')
     this.load.animation('explosion_centre_anim', '../assets/explosion_centre_anim.json')
     this.load.animation('explosion_north_anim', '../assets/explosion_north_anim.json')
     this.load.animation('explosion_north_end_anim', '../assets/explosion_north_end_anim.json')
@@ -189,6 +190,8 @@ export default class GameScene extends Scene {
         this.avatars.set(avatar.id, { avatar: _avatar })
         
     this.add.sprite(_avatar.x,_avatar.y,'powerups','glove')
+    let blahhh = this.add.sprite(_avatar.x,_avatar.y, 'powerups', 'power_up_border_1')
+    blahhh.anims.play('bomb_regular_lit',true)
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar
@@ -256,7 +259,7 @@ serverReconciliation = (movement) => {
 
 clientPrediction = (movement) => {
   const { left, up, right, down } = movement
-  const speed = 64
+  const speed = 80
   const player = this.avatars.get(this.socket.id).avatar
 
   if (player) {
