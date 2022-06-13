@@ -35,9 +35,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   hitWithExplosion() {
-    this.processingDamage = true
-    this.kill()
-    console.log('killed: ' + this.playerID)
+    if (!this.processingDamage) {
+      this.processingDamage = true
+      this.kill()
+      console.log('killed: ' + this.playerID)
+    }
   }
 
   kill() {

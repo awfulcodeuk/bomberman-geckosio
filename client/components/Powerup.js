@@ -1,9 +1,8 @@
 export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
     let { scene, x, y, powerupType, powerupID, isDestroyed } = data
-    let frame = powerupType
-    
-    super(scene, x, y, frame)
+
+    super(scene, x, y)
 
     this.powerupID = powerupID
     this.powerupType = powerupType
@@ -16,8 +15,8 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
       this.body.setSize(60,60)
       this.setImmovable()
       this.mainSprite = this.scene.add.sprite(this.x,this.y,'powerups', this.powerupType)
-      this.borderSprite = this.scene.add.sprite(this.x,this.y, 'powerups', 'powerups_border_1')
-      this.borderSprite.anims.play('powerups_border_flashing',true)
+      this.borderSprite = this.scene.add.sprite(this.x,this.y)
+      this.borderSprite.anims.play('powerups_border_flashing', true)
     } else {
       this.setVisible(false)
     }
@@ -26,7 +25,9 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   setDestroyed() {
     if (!this.isDestroyed) {
       this.isDestroyed = true
-      this.setVisible(false)
+      this.scene.physicsPowerups.remove(this)
+      this.mainSprite.setVisible(false)
+      this.borderSprite.setVisible(false)
     }
   }
 }

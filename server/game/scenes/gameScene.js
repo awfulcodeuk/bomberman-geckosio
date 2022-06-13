@@ -25,7 +25,8 @@ import Bomb from '../components/Bomb.js'
 import Powerup from '../components/Powerup.js'
 
 // imports for stages
-const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01.json', 'utf8')))
+const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
+const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
 
 export class GameScene extends Scene {
   constructor() {
@@ -61,7 +62,8 @@ export class GameScene extends Scene {
 
   maybeSpawnPowerup(x, y) {
     if (Math.random() > 0.0001) {
-      let powerupEntity = new Powerup({scene: this, x: x, y: y, powerupType: 'bomb_normal', powerupID: this.getNewEntityID(), isDestroyed: false})
+      const powerupType = stagePowerupPool[Math.floor(Math.random() * (stagePowerupPool.length))]
+      const powerupEntity = new Powerup({scene: this, x: x, y: y, powerupType: powerupType, powerupID: this.getNewEntityID(), isDestroyed: false})
       this.physicsPowerups.add(powerupEntity)
       let powerupID = powerupEntity.powerupID
       this.powerups.set(powerupEntity.entityID, {
@@ -82,6 +84,12 @@ export class GameScene extends Scene {
     this.explosionColliders = this.physics.add.staticGroup()
     this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
+    this.physics.add.overlap(this.physicsAvatars, this.physicsPowerups, function(collectingAvatar,powerUpEntity) {
+      //console.log(collectingAvatar)
+      //console.log(powerUpEntity)
+      // give the power up to the player and destroy the entity
+      powerUpEntity.processPickupByAvatar(collectingAvatar)
+    }, false, this)
     // create stage
     let rowCount = 0
     let colCount = 0
@@ -90,7 +98,7 @@ export class GameScene extends Scene {
         const blockID = this.blockIDCounter
         // "b" breakable blocks have a tiny chance of not being created. "e" edge and "s" static always are
         if (colEntry === "e" || colEntry === "s" || (colEntry === "b" && Math.random() > 0.05)) {
-          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), serverMode: true, blockType: colEntry, blockID: blockID, entityID: this.getNewEntityID()})
+          let blockEntity = new Block({scene: this, x: (colCount * 64 + 32), y: (rowCount * 64 + 32), blockType: colEntry, blockID: blockID, entityID: this.getNewEntityID()})
           this.blocks.set(blockID, {
             blockID, 
             blockEntity

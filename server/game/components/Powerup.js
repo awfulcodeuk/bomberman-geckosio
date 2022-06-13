@@ -18,9 +18,16 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
     this.setImmovable()
   }
   
+  processPickupByAvatar(avatar) {
+    console.log(this.powerupType)
+    console.log(avatar.playerID)
+    this.setDestroyed()
+  }
+
   setDestroyed() {
     if (!this.isDestroyed) {
       this.isDestroyed = true
+      this.scene.physicsPowerups.remove(this)
       this.setVisible(false)
     }
   }

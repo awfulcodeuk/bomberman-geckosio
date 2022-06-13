@@ -1,24 +1,8 @@
 export default class Block extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, frame, serverMode, blockType, blockID, entityID, isDestroyed } = data
+    let { scene, x, y, frame, blockType, blockID, entityID, isDestroyed } = data
 
-    switch (blockType) {
-      case "e":
-        frame = 'edge_block'
-        break
-      case "s":
-        frame = 'static_block'
-        break
-      default:
-        // probably a "b"
-        frame = 'breakable_block'
-    }
-
-    if (serverMode) {
-      super(scene, x, y, '')
-    } else {
-      super(scene, x, y, frame)
-    }
+    super(scene, x, y)
 
     this.entityID = entityID
 
@@ -40,7 +24,6 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
       this.scene.time.delayedCall(1000, () => {
         this.scene.physicsBlocks.remove(this)
         this.scene.maybeSpawnPowerup(this.x,this.y)
-      
       }, [], this)
       //console.log(this.blockID)
       //console.log(this.blockType)
