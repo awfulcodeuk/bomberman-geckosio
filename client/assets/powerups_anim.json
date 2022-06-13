@@ -1,22 +1,22 @@
 {
     "anims": [
         {
-            "key": "power_up_border_flashing",
+            "key": "powerups_border_flashing",
             "type": "frames",
             "repeat": -1,
-            "frameRate": 3,
+            "frameRate": 8,
             "frames": [
                 {
-                    "key": "power_up_border",
-                    "frame": "power_up_border_1"
+                    "key": "powerups",
+                    "frame": "powerups_border_1"
                 },
                 {
-                    "key": "power_up_border",
-                    "frame": "power_up_border_2"
+                    "key": "powerups",
+                    "frame": "powerups_border_2"
                 },
                 {
-                    "key": "power_up_border",
-                    "frame": "power_up_border_3"
+                    "key": "powerups",
+                    "frame": "powerups_border_3"
                 }
             ]
         }

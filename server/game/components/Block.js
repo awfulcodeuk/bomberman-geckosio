@@ -37,7 +37,11 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
     // only actually do anything if it's a "b" breakable block
     if (this.blockType === 'b') {
       this.isDestroyed = true
-      this.scene.physicsBlocks.remove(this)
+      this.scene.time.delayedCall(1000, () => {
+        this.scene.physicsBlocks.remove(this)
+        this.scene.maybeSpawnPowerup(this.x,this.y)
+      
+      }, [], this)
       //console.log(this.blockID)
       //console.log(this.blockType)
       //console.log(this.x)

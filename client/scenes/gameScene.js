@@ -13,6 +13,7 @@ import Player from '../components/Player.js'
 import Block from '../components/Block.js'
 import Bomb from '../components/Block.js'
 import Explosion from '../components/Explosion.js'
+import Powerup from '../components/Powerup.js'
 
 export default class GameScene extends Scene {
   constructor() {
@@ -23,6 +24,7 @@ export default class GameScene extends Scene {
     this.blocks = new Map()
     this.bombs = new Map()
     this.explosions = new Map()
+    this.powerups = new Map()
 
     this.bombCoolDown = false
   }
@@ -80,6 +82,7 @@ export default class GameScene extends Scene {
     this.physicsBlocks = this.physics.add.staticGroup()
     this.physicsAvatars = this.physics.add.group()
     this.physicsBombs = this.physics.add.group()
+    this.physicsPowerups = this.physics.add.group()
 
     this.cursors = this.input.keyboard.createCursorKeys()
 
@@ -124,15 +127,17 @@ export default class GameScene extends Scene {
     const blockSnap = SI.calcInterpolation('x y', 'blocks')
     const bombSnap = SI.calcInterpolation('x y', 'bombs')
     const explosionSnap = SI.calcInterpolation('x y', 'explosions')
+    const powerupsSnap = SI.calcInterpolation('x y', 'powerups')
     
-    if (!snap  || !blockSnap || !bombSnap || !explosionSnap) return
+    if (!snap  || !blockSnap || !bombSnap || !explosionSnap || !powerupsSnap) return
 
     const { state } = snap
     const blockState = blockSnap.state
     const bombState = bombSnap.state
     const explosionState = explosionSnap.state
+    const powerupsState = powerupsSnap.state
     
-    if (!state || !blockState || !bombState || !explosionState) return
+    if (!state || !blockState || !bombState || !explosionState || !powerupsState) return
 
     blockState.forEach(block => {
       const exists = this.blocks.has(block.id)
@@ -170,6 +175,23 @@ export default class GameScene extends Scene {
       }
     })
 
+    powerupsState.forEach(powerup => {
+      const exists = this.powerups.has(powerup.id)
+      if (!exists) {
+        const _powerup = new Powerup({scene: this, x: powerup.x, y: powerup.y, powerupType: powerup.powerupType, isDestroyed: powerup.isDestroyed})
+        this.powerups.set(powerup.id, 
+          { powerup: _powerup }
+          )
+      } else {
+        const _powerup = this.powerups.get(powerup.id).powerup
+        _powerup.setX(powerup.x)
+        _powerup.setY(powerup.y)
+        if (powerup.isDestroyed) {
+          _powerup.setDestroyed()
+        }
+      }
+    })
+
     const movement = {
       left: this.cursors.left.isDown,
       right: this.cursors.right.isDown,
@@ -188,10 +210,6 @@ export default class GameScene extends Scene {
         _avatar.setY(avatar.y)
         _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
         this.avatars.set(avatar.id, { avatar: _avatar })
-        
-    this.add.sprite(_avatar.x,_avatar.y,'powerups','glove')
-    let blahhh = this.add.sprite(_avatar.x,_avatar.y, 'powerups', 'power_up_border_1')
-    blahhh.anims.play('bomb_regular_lit',true)
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar

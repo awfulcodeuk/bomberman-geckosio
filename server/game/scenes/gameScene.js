@@ -22,6 +22,7 @@ const __dirname = dirname(__filename)
 import Player from '../components/Player.js'
 import Block from '../components/Block.js'
 import Bomb from '../components/Bomb.js'
+import Powerup from '../components/Powerup.js'
 
 // imports for stages
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01.json', 'utf8')))
@@ -35,6 +36,7 @@ export class GameScene extends Scene {
     this.players = new Map()
     this.blocks = new Map()
     this.bombs = new Map()
+    this.powerups = new Map()
     this.explosions = new Map()
     this.lifetimeBombCount = 0
     this.lifetimeExplosionCount = 0
@@ -57,6 +59,18 @@ export class GameScene extends Scene {
     return 'hi!'
   }
 
+  maybeSpawnPowerup(x, y) {
+    if (Math.random() > 0.0001) {
+      let powerupEntity = new Powerup({scene: this, x: x, y: y, powerupType: 'bomb_normal', powerupID: this.getNewEntityID(), isDestroyed: false})
+      this.physicsPowerups.add(powerupEntity)
+      let powerupID = powerupEntity.powerupID
+      this.powerups.set(powerupEntity.entityID, {
+        powerupID,
+        powerupEntity
+      })
+    }
+  }
+
   create() {
     this.playersGroup = this.add.group()
     this.physics.world.setBounds(64, 64, 704, 768)
@@ -64,6 +78,7 @@ export class GameScene extends Scene {
     this.physicsBlocks = this.physics.add.staticGroup()
     this.physicsAvatars = this.physics.add.group()
     this.physicsBombs = this.physics.add.group()
+    this.physicsPowerups = this.physics.add.group()
     this.explosionColliders = this.physics.add.staticGroup()
     this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
@@ -175,11 +190,19 @@ export class GameScene extends Scene {
       explosionsArr.push({ id: explosionID, x: explosionEntity.x, y: explosionEntity.y, frame: explosionEntity.frame })
     })
     
+    // get an array of all powerups
+    const powerupsArr = []
+    this.powerups.forEach(powerup => {
+      const { powerupID, powerupEntity } = powerup
+      powerupsArr.push({ id: powerupID, x: powerupEntity.x, y: powerupEntity.y, powerupType: powerupEntity.powerupType, isDestroyed: powerupEntity.isDestroyed })
+    })
+    
     const worldState = {
       players: avatars,
       blocks: blocksArr,
       bombs: bombsArr,
-      explosions: explosionsArr
+      explosions: explosionsArr,
+      powerups: powerupsArr
     }
 
     const snapshot = SI.snapshot.create(worldState)
