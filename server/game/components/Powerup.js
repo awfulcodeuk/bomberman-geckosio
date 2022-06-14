@@ -1,6 +1,6 @@
 export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, powerupType, powerupID, isDestroyed } = data
+    let { scene, x, y, powerupType, powerupID } = data
     
     let frame = powerupType
 
@@ -9,7 +9,7 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
     this.powerupID = powerupID
     this.powerupType = powerupType
     this.frame = powerupType
-    this.isDestroyed = isDestroyed
+    this.isDestroyed = false
 
 
     scene.add.existing(this)
@@ -19,8 +19,6 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   }
   
   processPickupByAvatar(avatar) {
-    console.log(this.powerupType)
-    console.log(avatar.playerID)
     this.setDestroyed()
   }
 
