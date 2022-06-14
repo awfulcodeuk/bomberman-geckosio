@@ -9,7 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this)
     scene.physicsAvatars.add(this)
     this.body.setSize(50,50)
-    this.body.setOffset(-3,14)
+    this.body.setOffset(-3,10)
     this.body.setBounce(0)
     this.body.setCollideWorldBounds()
     

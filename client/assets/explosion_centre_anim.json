@@ -4,7 +4,7 @@
             "key": "explosion_centre_anim",
             "type": "frames",
             "repeat": 0,
-            "frameRate": 6,
+            "frameRate": 8,
             "frames": [
                 {
                     "key": "explosion_centre",

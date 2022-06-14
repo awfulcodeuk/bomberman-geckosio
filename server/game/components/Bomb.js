@@ -25,7 +25,7 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.blocksToHit = new Map()
     this.bombsToHit = new Map()
     // use this for triggering the explosion
-    this.bombCountdown = this.scene.time.delayedCall(3000, this.explode, [], this)
+    this.bombCountdown = this.scene.time.delayedCall(3500, this.explode, [], this)
   }
 
   hitWithExplosion() {
