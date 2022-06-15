@@ -92,6 +92,13 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
           entityType
         })
       }, false, this)
+      this.scene.physics.add.overlap(this.scene.explosionColliders,this.scene.physicsPowerups,function(explosionCollider,hitEntity) {
+        const entityType = 'powerup'
+        this.entitiesToHit.set(hitEntity.entityID, {
+          hitEntity,
+          entityType
+        })
+      }, false, this)
 
       let explosionNorthBlockedAt = 100 
       let explosionEastBlockedAt = 100

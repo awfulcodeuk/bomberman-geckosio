@@ -188,7 +188,7 @@ export default class GameScene extends Scene {
     powerupsState.forEach(powerup => {
       const exists = this.powerups.has(powerup.id)
       if (!exists) {
-        const _powerup = new Powerup({scene: this, x: powerup.x, y: powerup.y, powerupType: powerup.powerupType, isDestroyed: powerup.isDestroyed})
+        const _powerup = new Powerup({scene: this, x: powerup.x, y: powerup.y, powerupType: powerup.powerupType, isBlownUp: powerup.isBlownUp, isDestroyed: powerup.isDestroyed})
         this.powerups.set(powerup.id, 
           { powerup: _powerup }
           )
@@ -196,6 +196,7 @@ export default class GameScene extends Scene {
         const _powerup = this.powerups.get(powerup.id).powerup
         _powerup.setX(powerup.x)
         _powerup.setY(powerup.y)
+        _powerup.isBlownUp = powerup.isBlownUp
         if (powerup.isDestroyed) {
           _powerup.setDestroyed()
         }

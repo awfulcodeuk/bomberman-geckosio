@@ -9,6 +9,7 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
     this.powerupID = powerupID
     this.powerupType = powerupType
     this.frame = powerupType
+    this.isBlownUp = false
     this.isDestroyed = false
 
 
@@ -48,6 +49,15 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
         break
       default:
         console.log('not implemented yet: ' + String(this.powerupType))
+    }
+  }
+
+  hitWithExplosion() {
+    if (this.powerupType != 'skull') {
+      this.isBlownUp = true
+      this.setDestroyed()
+    } else {
+      // respawn a skull somewhere else
     }
   }
 

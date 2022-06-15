@@ -1,11 +1,12 @@
 export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, powerupType, powerupID } = data
+    let { scene, x, y, powerupType, powerupID, isBlownUp } = data
 
     super(scene, x, y)
 
     this.powerupID = powerupID
     this.powerupType = powerupType
+    this.isBlownUp = isBlownUp
     this.isDestroyed = false
 
     scene.add.existing(this)
@@ -26,7 +27,7 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   
   setDestroyed() {
     if (!this.isDestroyed) {
-      this.effectMusic.play()
+      if (!this.isBlownUp) this.effectMusic.play()
       this.isDestroyed = true
       this.scene.physicsPowerups.remove(this)
       this.mainSprite.destroy()

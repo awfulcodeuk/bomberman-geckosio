@@ -203,7 +203,7 @@ export class GameScene extends Scene {
     const powerupsArr = []
     this.powerups.forEach(powerup => {
       const { powerupID, powerupEntity } = powerup
-      powerupsArr.push({ id: powerupID, x: powerupEntity.x, y: powerupEntity.y, powerupType: powerupEntity.powerupType, isDestroyed: powerupEntity.isDestroyed })
+      powerupsArr.push({ id: powerupID, x: powerupEntity.x, y: powerupEntity.y, powerupType: powerupEntity.powerupType, isBlownUp: powerupEntity.isBlownUp, isDestroyed: powerupEntity.isDestroyed })
     })
     
     const worldState = {
