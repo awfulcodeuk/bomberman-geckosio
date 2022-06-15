@@ -40,6 +40,7 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
       this.anims.play('stage_01_block_destroying', true)
       this.once('animationcomplete', () => {
         this.setVisible(false)
+        this.scene.physicsBlocks.remove(this)
       })
     }
   }

@@ -20,6 +20,35 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
   
   processPickupByAvatar(avatar) {
     this.setDestroyed()
+    switch (String(this.powerupType)) {
+      case 'bomb_normal':
+        avatar.increaseMaxBombs()
+        console.log('test')
+        break
+      case 'bomb_super':
+        avatar.increaseMaxBombs(10)
+        break
+      case 'fire_normal':
+        avatar.increaseBombRange()
+        break
+      case 'fire_super':
+        avatar.increaseBombRange(10)
+        break
+      case 'skates':
+        avatar.increaseSpeed()
+        break
+      case 'glove':
+        avatar.giveGlove()
+        break
+      case 'kick':
+        avatar.giveKick()
+        break
+      case 'skull':
+        avatar.giveSkull()
+        break
+      default:
+        console.log('not implemented yet: ' + String(this.powerupType))
+    }
   }
 
   setDestroyed() {

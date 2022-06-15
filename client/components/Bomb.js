@@ -19,6 +19,7 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     if (!this.isDestroyed) {
       this.isDestroyed = true
       this.setVisible(false)
+      scene.physicsBombs.remove(this)
     }
   }
 }

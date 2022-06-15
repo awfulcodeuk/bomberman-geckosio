@@ -239,7 +239,7 @@ export default class GameScene extends Scene {
       this.bombCoolDown = true
       const droppingPlayer = this.avatars.get(this.channel.id).avatar
       this.channel.emit('dropBomb')
-      setTimeout(() => this.bombCoolDown = false, 1000)
+      setTimeout(() => this.bombCoolDown = false, 250)
     }
   }
   

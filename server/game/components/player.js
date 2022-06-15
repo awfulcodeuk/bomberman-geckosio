@@ -63,12 +63,46 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.animFrame = playerAnimFrame
   }
 
-  setMaxBombs(newMaxBombs) {
-    this.maxBombs = newMaxBombs
+  increaseMaxBombs(amount = 1) {
+    this.maxBombs = this.maxBombs + amount
+    if (this.maxBombs > 10) this.maxBombs = 10
   }
 
-  setBombPower(newBombPower) {
-    this.bombPower = newBombPower
+  decreaseMaxBombs() {
+    this.maxBombs--
+    if (this.maxBombs < 1) this.maxBombs = 1
+  }
+
+  increaseBombRange(amount = 1) {
+    this.bombRange = this.bombRange + amount
+    if (this.bombRange > 10) this.bombRange = 10
+  }
+
+  decreaseBombRange() {
+    this.bombRange--
+    if (this.bombRange < 1) this.bombRange = 1
+  }
+
+  increaseSpeed() {
+    this.speed = this.speed + 10
+    if (this.speed > 160) this.speed = 160
+  }
+
+  decreaseSpeed() {
+    this.speed = this.speed - 10
+    if (this.speed < 40) this.speed = 40
+  }
+
+  giveGlove() {
+    console.log('got glove')
+  }
+  
+  giveKick() {
+    console.log('got kick')
+  }
+
+  giveSkull() {
+    console.log('got skull')
   }
 
   update() {

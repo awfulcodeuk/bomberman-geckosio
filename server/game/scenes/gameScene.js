@@ -39,7 +39,6 @@ export class GameScene extends Scene {
     this.bombs = new Map()
     this.powerups = new Map()
     this.explosions = new Map()
-    this.lifetimeBombCount = 0
     this.lifetimeExplosionCount = 0
     this.spawnLocations = []
     this.globalEntityID = 0
@@ -151,9 +150,9 @@ export class GameScene extends Scene {
       channel.on('dropBomb', dropBomb => {
         const player = this.players.get(channel.id).avatar
         if (player.currentLaidBombs <= player.maxBombs ) {
-          const bombID = this.lifetimeBombCount++
+          const bombID = this.getNewEntityID()
           player.addCurrentLaidBomb()
-          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: this.getNewEntityID(), owningPlayer: player, isDestroyed: false})
+          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: bombID, owningPlayer: player, isDestroyed: false})
           this.bombs.set(bombID, {
             bombID,
             bombEntity
