@@ -71,7 +71,6 @@ export class GameScene extends Scene {
         powerupID,
         powerupEntity
       })
-      console.log(stagePowerupPool.length)
     }
   }
 
@@ -152,7 +151,7 @@ export class GameScene extends Scene {
 
       channel.on('dropBomb', dropBomb => {
         const player = this.players.get(channel.id).avatar
-        if (player.currentLaidBombs <= player.maxBombs ) {
+        if (player.currentLaidBombs < player.maxBombs ) {
           const bombID = this.getNewEntityID()
           player.addCurrentLaidBomb()
           const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: bombID, owningPlayer: player, isDestroyed: false})
