@@ -25,12 +25,14 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
     this.isDestroyed = isDestroyed
 
     scene.add.existing(this)
+    
     if (!this.isDestroyed) {
       scene.physicsBlocks.add(this)
       this.body.setSize(64,64)
       this.setImmovable()
     } else {
       this.setVisible(false)
+      this.destroy()
     }
   }
   
@@ -41,6 +43,7 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
       this.once('animationcomplete', () => {
         this.setVisible(false)
         this.scene.physicsBlocks.remove(this)
+        this.destroy()
       })
     }
   }

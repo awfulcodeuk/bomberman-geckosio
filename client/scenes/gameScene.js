@@ -11,7 +11,7 @@ import FullscreenButton from '../components/fullscreenButton.js'
 // imports for components
 import Player from '../components/Player.js'
 import Block from '../components/Block.js'
-import Bomb from '../components/Block.js'
+import Bomb from '../components/Bomb.js'
 import Explosion from '../components/Explosion.js'
 import Powerup from '../components/Powerup.js'
 
@@ -56,7 +56,6 @@ export default class GameScene extends Scene {
     this.load.atlas('explosion_west', '../assets/items_effects.png', '../assets/explosion_west_atlas.json')
     this.load.atlas('explosion_west_end', '../assets/items_effects.png', '../assets/explosion_west_end_atlas.json')
     this.load.atlas('stage_01_block_destruction', '../assets/stage_01_block_destruction.png', '../assets/stage_01_block_destruction_atlas.json')
-    
 
     this.load.animation('player_1_anim', '../assets/players_01_anim.json')
     this.load.animation('player_2_anim', '../assets/players_02_anim.json')
@@ -74,6 +73,13 @@ export default class GameScene extends Scene {
     this.load.animation('explosion_west_anim', '../assets/explosion_west_anim.json')
     this.load.animation('explosion_west_end_anim', '../assets/explosion_west_end_anim.json')
     this.load.animation('stage_01_block_destruction', '../assets/stage_01_block_destruction_anim.json')
+
+    this.load.audio('stage_01_bgm', '../assets/audio/bgm/stage_01_bgm.mp3')
+    this.load.audio('bomb_bounce', '../assets/audio/effects/bomb_bounce.mp3')
+    this.load.audio('bomb_explode', '../assets/audio/effects/bomb_explode.mp3')
+    this.load.audio('kick', '../assets/audio/effects/kick.mp3')
+    this.load.audio('kick_voice', '../assets/audio/effects/kick_voice.mp3')
+    this.load.audio('item_get', '../assets/audio/effects/item_get.mp3')
   }
 
   create() {
@@ -117,6 +123,11 @@ export default class GameScene extends Scene {
         console.error(error.message)
       }
     })
+
+    const bgmMusic = this.sound.add('stage_01_bgm')
+
+    bgmMusic.play()
+
   }
 
   update() {
@@ -164,7 +175,6 @@ export default class GameScene extends Scene {
         this.bombs.set(bomb.id, 
           { bomb: _bomb }
           )
-        _bomb.anims.play('bomb_regular_lit', true)
       } else {
         const _bomb = this.bombs.get(bomb.id).bomb
         _bomb.setX(bomb.x)

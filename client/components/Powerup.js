@@ -16,14 +16,22 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
     this.mainSprite = this.scene.add.sprite(this.x,this.y,'powerups', this.powerupType)
     this.borderSprite = this.scene.add.sprite(this.x,this.y)
     this.borderSprite.anims.play('powerups_border_flashing', true)
+    
+    if (this.powerupType != 'kick') {
+      this.effectMusic = this.scene.sound.add('item_get')
+    } else {
+      this.effectMusic = this.scene.sound.add('kick_voice')
+    }
   }
   
   setDestroyed() {
     if (!this.isDestroyed) {
+      this.effectMusic.play()
       this.isDestroyed = true
       this.scene.physicsPowerups.remove(this)
       this.mainSprite.destroy()
       this.borderSprite.destroy()
+      this.destroy()
     }
   }
 }
