@@ -30,5 +30,20 @@
     "28": ["glove"],
     "29": ["kick"],
     "30": ["kick"],
-    "31": ["skull"]
+    "31": ["skull"],
+    "32": ["skates"],
+    "33": ["skates"],
+    "34": ["skates"],
+    "35": ["skates"],
+    "36": ["skates"],
+    "37": ["bomb_normal"],
+    "38": ["bomb_normal"],
+    "39": ["bomb_normal"],
+    "40": ["bomb_normal"],
+    "41": ["bomb_normal"],
+    "42": ["fire_normal"],
+    "43": ["fire_normal"],
+    "44": ["fire_normal"],
+    "45": ["fire_normal"],
+    "46": ["fire_normal"]
 }

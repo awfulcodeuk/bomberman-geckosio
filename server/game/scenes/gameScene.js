@@ -60,15 +60,18 @@ export class GameScene extends Scene {
   }
 
   maybeSpawnPowerup(x, y) {
-    if (Math.random() > 0.3) {
-      const powerupType = stagePowerupPool[Math.floor(Math.random() * (stagePowerupPool.length))]
-      let powerupID = this.getNewEntityID()
+    if (Math.random() > 0.35 && stagePowerupPool.length != 0) {
+      const powerUpIndex = Math.floor(Math.random() * (stagePowerupPool.length))
+      const powerupType = stagePowerupPool[powerUpIndex]
+      stagePowerupPool.splice(powerUpIndex,1)
+      const powerupID = this.getNewEntityID()
       const powerupEntity = new Powerup({scene: this, x: x, y: y, powerupType: powerupType, powerupID: powerupID})
       this.physicsPowerups.add(powerupEntity)
       this.powerups.set(powerupID, {
         powerupID,
         powerupEntity
       })
+      console.log(stagePowerupPool.length)
     }
   }
 
