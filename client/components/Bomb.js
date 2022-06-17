@@ -1,6 +1,6 @@
 export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   constructor(data) {
-    let { scene, x, y, frame, isDestroyed} = data
+    let { scene, x, y, frame, isDestroyed } = data
     super(scene, x , y, frame)
     
     scene.add.existing(this)
@@ -11,11 +11,17 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
 
     this.isDestroyed = isDestroyed
     this.anims.play('bomb_regular_lit', true)
+    
+    const effectMusic = this.scene.sound.add('bomb_place')
+    effectMusic.play()
   }
   
+  playBombLaidSound() {
+  }
+
   setDestroyed() {
     if (!this.isDestroyed) {
-      this.isDestroyed = true
+      this.isDestroyed = true   
       this.setVisible(false)
       this.scene.physicsBombs.remove(this)
       this.destroy()

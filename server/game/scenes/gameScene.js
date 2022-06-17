@@ -189,7 +189,7 @@ export class GameScene extends Scene {
     const bombsArr = []
     this.bombs.forEach(bomb => {
       const { bombID, bombEntity } = bomb
-      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isDestroyed: bombEntity.isDestroyed })
+      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isDestroyed: bombEntity.isDestroyed, isConfirmedReal: bombEntity.isConfirmedReal })
     })
 
     // get an array of all explosions

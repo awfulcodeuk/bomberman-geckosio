@@ -4,7 +4,7 @@
             "key": "stage_01_block_destroying",
             "type": "frames",
             "repeat": 0,
-            "frameRate": 6,
+            "frameRate": 10,
             "frames": [
                 {
                     "key": "stage_01_block_destruction",

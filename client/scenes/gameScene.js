@@ -77,6 +77,7 @@ export default class GameScene extends Scene {
     this.load.audio('stage_01_bgm', '../assets/audio/bgm/stage_01_bgm.mp3')
     this.load.audio('bomb_bounce', '../assets/audio/effects/bomb_bounce.mp3')
     this.load.audio('bomb_explode', '../assets/audio/effects/bomb_explode.mp3')
+    this.load.audio('bomb_place', '../assets/audio/effects/bomb_place.mp3')
     this.load.audio('kick', '../assets/audio/effects/kick.mp3')
     this.load.audio('kick_voice', '../assets/audio/effects/kick_voice.mp3')
     this.load.audio('item_get', '../assets/audio/effects/item_get.mp3')
@@ -105,6 +106,8 @@ export default class GameScene extends Scene {
     
     this.physics.add.collider(this.physicsAvatars,this.physicsBlocks)
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
+
+    this.physics.add.overlap(this.physicsAvatars, this.physicsBombs)
 
     FullscreenButton(this)
 
@@ -249,7 +252,15 @@ export default class GameScene extends Scene {
     if (this.bombKey.isDown && !this.bombCoolDown) {
       this.bombCoolDown = true
       const droppingPlayer = this.avatars.get(this.channel.id).avatar
-      this.channel.emit('dropBomb')
+      droppingPlayer.onTopOfBomb = false
+      this.bombs.forEach(_bomb => {
+        if (droppingPlayer.body.hitTest(_bomb.bomb.x, _bomb.bomb.y)) {
+          droppingPlayer.onTopOfBomb = true
+        }
+      })
+      if (!droppingPlayer.onTopOfBomb) {
+        this.channel.emit('dropBomb')
+      }
       setTimeout(() => this.bombCoolDown = false, 250)
     }
   }
