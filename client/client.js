@@ -30,3 +30,4 @@ window.addEventListener('load', () => {
   const game = new Game(config)
   FullScreenEvent(() => resize(game))
 })
+
