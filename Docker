@@ -1,4 +1,4 @@
-FROM node:lts-gallium
+FROM node:lts-alpine
 
 # make the 'app' folder the current working directory
 WORKDIR /app
@@ -17,5 +17,5 @@ RUN npm run build
 
 RUN ls -al /app
 
-EXPOSE 1234
+EXPOSE 1235
 CMD [ "node", "server/server.js" ]
