@@ -49,7 +49,7 @@ export class GameScene extends Scene {
       iceServers: process.env.NODE_ENV === 'production' ? iceServers : [],
       portRange: {
         min: 27900,
-        max: 28000
+        max: 27920
       }
     })
     this.io.addServer(this.game.server)
