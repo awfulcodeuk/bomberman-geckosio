@@ -48,8 +48,8 @@ export class GameScene extends Scene {
     this.io = geckos({
       iceServers: process.env.NODE_ENV === 'production' ? iceServers : [],
       portRange: {
-        min: 10000,
-        max: 20000
+        min: 27900,
+        max: 28000
       }
     })
     this.io.addServer(this.game.server)
