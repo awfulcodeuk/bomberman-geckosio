@@ -35,5 +35,5 @@ app.get('/getState', (req, res) => {
 })
 
 server.listen(port, () => {
-  console.log('Express is listening on http://localhost:' + port)
+  console.log('Express is listening on ' + port + ' port.')
 })
