@@ -7,11 +7,11 @@ WORKDIR /app
 COPY package*.json ./
 
 # install project dependencies
-RUN npm install
+RUN npm install --omit=dev
 
 COPY . .
 
 RUN ls -al /app
 
-EXPOSE 1235
+EXPOSE 1235 10000-20000/udp
 CMD [ "node", "server/server.js" ]

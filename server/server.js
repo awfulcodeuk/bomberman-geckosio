@@ -13,7 +13,7 @@ const app = express()
 const server = http.createServer(app)
 
 const game = new PhaserGame(server)
-const port = 1444
+const port = 1235
 
 // TODO: Add helmet
 
@@ -35,5 +35,5 @@ app.get('/getState', (req, res) => {
 })
 
 server.listen(port, () => {
-  console.log('Express is listening on ' + port + ' port.')
+  console.log('Express is listening on port ' + port)
 })
