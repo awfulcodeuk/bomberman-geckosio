@@ -7,11 +7,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # install project dependencies
-RUN npm install --omit=dev
+RUN npm install && npm run build && npm prune --production
 
 COPY . .
-
-RUN npm run build
 
 RUN ls -al /app
 
