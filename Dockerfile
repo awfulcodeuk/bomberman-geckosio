@@ -8,9 +8,11 @@ COPY package*.json ./
 COPY webpack.config.cjs ./
 
 # install project dependencies
-RUN npm install && npm run build && npm prune --production
+RUN npm install
 
 COPY . .
+
+RUN npm run build && npm prune --production
 
 RUN ls -al /app
 
