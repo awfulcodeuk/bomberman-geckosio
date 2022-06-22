@@ -11,6 +11,8 @@ RUN npm install --omit=dev
 
 COPY . .
 
+RUN npm run build
+
 RUN ls -al /app
 
 EXPOSE 3000 27900-27920/udp

@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "npm run dev",
+    "build": "webpack --config=webpack.config.cjs --progress",
     "dev": "npm-run-all --parallel dev:*",
     "play": "cross-env-shell NODE_ENV=production node server/server.js",
     "test": "node test/test.js",
