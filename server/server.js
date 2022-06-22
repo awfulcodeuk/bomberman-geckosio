@@ -13,7 +13,7 @@ const app = express()
 const server = http.createServer(app)
 
 const game = new PhaserGame(server)
-const port = 1235
+const port = 3000
 
 // TODO: Add helmet
 

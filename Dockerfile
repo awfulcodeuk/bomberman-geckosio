@@ -13,5 +13,5 @@ COPY . .
 
 RUN ls -al /app
 
-EXPOSE 1235 27900-27920/udp
+EXPOSE 3000 27900-27920/udp
 CMD [ "node", "server/server.js" ]
