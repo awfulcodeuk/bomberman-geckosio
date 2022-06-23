@@ -6,7 +6,7 @@ export default class BootScene extends Scene {
     super({ key: 'BootScene' })
 
     //const channel = geckos({ port: 3000 })
-    const channel = geckos()
+    const channel = geckos({port:null})
 
     channel.onConnect(error => {
       if (error) console.error(error.message)
