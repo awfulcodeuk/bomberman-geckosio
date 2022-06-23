@@ -17,7 +17,9 @@ const port = 3000
 
 // TODO: Add helmet
 
-app.use(cors())
+app.use(cors({
+  origin: '*'
+}))
 
 app.use('/', express.static(path.join(__dirname, '../client')))
 
