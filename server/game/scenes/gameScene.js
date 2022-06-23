@@ -24,7 +24,7 @@ import Block from '../components/Block.js'
 import Bomb from '../components/Bomb.js'
 import Powerup from '../components/Powerup.js'
 
-// imports for stages
+// imports for stages // blah
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
 const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
 
