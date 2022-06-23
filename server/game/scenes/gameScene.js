@@ -45,10 +45,8 @@ export class GameScene extends Scene {
   }
 
   init() {
-    const coturnServer = []
-    console.log(iceServers)
     this.io = geckos({
-      iceServers: coturnServer,
+      iceServers: iceServers,
       portRange: {
         min: 27900,
         max: 27920
