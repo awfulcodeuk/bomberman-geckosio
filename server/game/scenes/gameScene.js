@@ -28,6 +28,7 @@ import Powerup from '../components/Powerup.js'
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
 const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
 
+
 export class GameScene extends Scene {
   constructor() {
     super({ key: 'GameScene' })
