@@ -26,11 +26,6 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.bombsToHit = new Map()
     // use this for triggering the explosion
     this.bombCountdown = this.scene.time.delayedCall(3500, this.explode, [], this)
-    this.scene.physics.add.overlap(this,this.scene.physicsBombs,function(thisBomb,otherBomb) {
-      // not sure why otherBomb is required - if use thisBomb it deletes the old one, not the new one
-      if (typeof(this.isBombRealCountdown) != 'undefined') this.isBombRealCountdown.destroy()
-      thisBomb.removeFromScene()
-    }, false, this)
   }
 
   hitWithExplosion() {
@@ -42,7 +37,6 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     this.isDestroyed = true
     this.owningPlayer.removeCurrentLaidBomb()
     this.scene.physicsBombs.remove(this)
-    if (typeof(this.bombCountdown) != 'undefined') this.bombCountdown.destroy()
     this.destroy()
   }
 

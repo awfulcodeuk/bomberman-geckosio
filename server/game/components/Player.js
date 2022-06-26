@@ -19,7 +19,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.entityID = entityID
     this.bombRange = 2
-    this.maxBombs = 1
+    this.maxBombs = 10
     this.currentLaidBombs = 0
 
     this.speed = 80

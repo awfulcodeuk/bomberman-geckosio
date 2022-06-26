@@ -154,15 +154,34 @@ export class GameScene extends Scene {
       })
 
       channel.on('dropBomb', dropBomb => {
+        console.log('dropbombed')
         const player = this.players.get(channel.id).avatar
         if (player.currentLaidBombs < player.maxBombs ) {
-          const bombID = this.getNewEntityID()
-          player.addCurrentLaidBomb()
-          const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: bombID, owningPlayer: player, isDestroyed: false})
-          this.bombs.set(bombID, {
-            bombID,
-            bombEntity
+          // align bombs to grid
+          const dropBombX = Math.floor(player.x / 64) * 64 + 32
+          const dropBombY = Math.floor(player.y / 64) * 64 + 32
+          const dropBombRect = new Phaser.Geom.Rectangle(dropBombX, dropBombY, 60, 60)
+          this.isNewBombBlocked = false
+          // check client gameScene for use of hittest
+          this.bombs.forEach(bomb => {
+            if (bomb.bombEntity.isDestroyed === false) {
+              const existingBombRect = new Phaser.Geom.Rectangle(bomb.bombEntity.x, bomb.bombEntity.y, 60, 60)
+              const isIntersecting = Phaser.Geom.Intersects.RectangleToRectangle(dropBombRect, existingBombRect);
+              if (isIntersecting) {
+                this.isNewBombBlocked = true
+                console.log('bomb blocked')
+              }
+            }
           })
+          if (!this.isNewBombBlocked) {
+            const bombID = this.getNewEntityID()
+            player.addCurrentLaidBomb()
+            const bombEntity = new Bomb({scene: this, x: player.x, y: player.y, bombID: bombID, entityID: bombID, owningPlayer: player, isDestroyed: false})
+            this.bombs.set(bombID, {
+              bombID,
+              bombEntity
+            })
+          }
         }
       })
 
@@ -232,4 +251,6 @@ export class GameScene extends Scene {
    getNewEntityID() {
     return this.globalEntityID++
   }
+
+
 }
