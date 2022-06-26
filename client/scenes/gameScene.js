@@ -227,10 +227,14 @@ export default class GameScene extends Scene {
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar
-          _avatar.setX(avatar.x)
-          _avatar.setY(avatar.y)
-          _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
-          _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
+          if (avatar.isDead && !_avatar.isDead) {
+            _avatar.kill()
+          } else if (!avatar.isDead) {
+            _avatar.setX(avatar.x)
+            _avatar.setY(avatar.y)
+            _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
+            _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
+          }
         //}
       }
     })
@@ -251,16 +255,7 @@ export default class GameScene extends Scene {
 
     if (this.bombKey.isDown && !this.bombCoolDown) {
       this.bombCoolDown = true
-      const droppingPlayer = this.avatars.get(this.channel.id).avatar
-      droppingPlayer.onTopOfBomb = false
-      this.bombs.forEach(_bomb => {
-        if (droppingPlayer.body.hitTest(_bomb.bomb.x, _bomb.bomb.y)) {
-          droppingPlayer.onTopOfBomb = true
-        }
-      })
-      if (!droppingPlayer.onTopOfBomb) {
-        this.channel.emit('dropBomb')
-      }
+      this.channel.emit('dropBomb')
       setTimeout(() => this.bombCoolDown = false, 250)
     }
   }

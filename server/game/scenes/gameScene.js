@@ -154,7 +154,6 @@ export class GameScene extends Scene {
       })
 
       channel.on('dropBomb', dropBomb => {
-        console.log('dropbombed')
         const player = this.players.get(channel.id).avatar
         if (player.currentLaidBombs < player.maxBombs ) {
           // align bombs to grid
@@ -169,7 +168,6 @@ export class GameScene extends Scene {
               const isIntersecting = Phaser.Geom.Intersects.RectangleToRectangle(dropBombRect, existingBombRect);
               if (isIntersecting) {
                 this.isNewBombBlocked = true
-                console.log('bomb blocked')
               }
             }
           })
@@ -198,7 +196,7 @@ export class GameScene extends Scene {
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
-      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs})
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, isDead: avatar.isDead})
     })
 
     // get an array of all blocks

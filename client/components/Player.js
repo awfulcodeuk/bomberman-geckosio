@@ -3,23 +3,35 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, frame)
     
     this.playerID = playerID
+    this.isDead = false
 
     this.setOrigin(0.7,0.9)
         
     scene.add.existing(this)
     scene.physicsAvatars.add(this)
 
-    this.body.setSize(50,50)
+    this.body.setCircle(25)
     this.body.setOffset(-3,14)
     this.body.setBounce(0)
     this.body.setCollideWorldBounds()
 
-    this.onTopOfBomb = false
+    this.setDepth(1)
+
     this.bombRange = 2
     this.maxBombs = 1
     this.currentLaidBombs = 0
     
     this.processingDamage = false
+  }
+
+  kill() {
+    this.isDead = true
+    this.scene.physicsAvatars.remove(this)
+    console.log("dead: " + this.playerID)
+    this.anims.play('p1_die', true)
+    this.once('animationcomplete', () => {
+      this.destroy()
+    })
   }
 
   setMaxBombs(newMaxBombs) {

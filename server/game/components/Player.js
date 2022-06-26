@@ -8,7 +8,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
     scene.add.existing(this)
     scene.physicsAvatars.add(this)
-    this.body.setSize(50,50)
+    this.body.setCircle(25)
     this.body.setOffset(-3,10)
     this.body.setBounce(0)
     this.body.setCollideWorldBounds()
@@ -19,12 +19,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.entityID = entityID
     this.bombRange = 2
-    this.maxBombs = 10
+    this.maxBombs = 1
     this.currentLaidBombs = 0
 
     this.speed = 80
 
-    this.dead = false
+    this.isDead = false
 
     this.playerID = playerID
     
@@ -43,12 +43,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   kill() {
-    this.dead = true
+    this.isDead = true
+    this.scene.physicsAvatars.remove(this)
     this.setActive(false)
   }
 
   setMove(move) {
-    this.move = move
+    if (!this.isDead) {
+      this.move = move
+    }
   }
 
   addCurrentLaidBomb() {

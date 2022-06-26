@@ -87,6 +87,42 @@
                     "frame": "p1_down_face"
                 }
             ]
+        },
+        {
+            "key": "p1_die",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 5,
+            "frames": [
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_1"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_2"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_3"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_4"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_5"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_6"
+                },
+                {
+                    "key": "player_1",
+                    "frame": "p1_death_7"
+                }
+            ]
         }
     ]
 }
