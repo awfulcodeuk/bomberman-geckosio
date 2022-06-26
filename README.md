@@ -2,11 +2,25 @@
 Credit to https://geckosio.github.io/ for the amazing libraries and examples.
 
 # Local Dev
-Install Caddy
+Install Caddy 2.5.x
 
-use the below config
-bman.foo.bar {
-    tls ./_wildcard.foo.bar.pem ./_wildcard.foo.bar-key.pem
+Powershell (admin)
+choco install mkcert
+
+Powershell (non-admin)
+cd to the caddy directory
+mkcert -install
+mkcert "*.local.dev"
+
+Hosts file
+add the following:
+127.0.0.1 bman.local.dev
+
+In the caddy directory
+Create file "Caddyfile"
+add the below config and save/close
+bman.local.dev {
+    tls ./_wildcard.local.dev.pem ./_wildcard.local.dev-key.pem
     reverse_proxy localhost:3001
     header {
         # enable HSTS
@@ -24,3 +38,10 @@ bman.foo.bar {
         header_up Upgrade websocket
     }
 }
+
+Powershell (non-admin)
+cd to caddy directory
+.\caddy.exe run --config Caddyfile
+
+Browser
+Navigate to https://bman.local.dev
