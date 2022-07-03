@@ -28,7 +28,19 @@ import Powerup from '../components/Powerup.js'
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
 const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
 
-iceServers.push({urls: 'stun:openrelay.metered.ca:80'})
+iceServers.push(
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  })
+
+iceServers.push(
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  })
 
 export class GameScene extends Scene {
   constructor() {
