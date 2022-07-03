@@ -131,7 +131,7 @@ export class GameScene extends Scene {
           this.blockIDCounter++
         } else if (parseInt(colEntry) >= 1 && parseInt(colEntry) < 100 ) {
           // only values of 1 to 100 will create spawn points
-          this.spawnLocations.push({x: (colCount * 64), y: (rowCount * 64)})
+          this.spawnLocations[parseInt(colEntry)-1] = ({x: (colCount * 64), y: (rowCount * 64)})
         }
         colCount++
       })

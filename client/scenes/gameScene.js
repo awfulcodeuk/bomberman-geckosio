@@ -174,10 +174,13 @@ export default class GameScene extends Scene {
     bombState.forEach(bomb => {
       const exists = this.bombs.has(bomb.id)
       if (!exists) {
-        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular', isDestroyed: bomb.isDestroyed})
+        const _bomb = new Bomb({scene: this, x: bomb.x, y: bomb.y, frame: 'bomb_regular'})
         this.bombs.set(bomb.id, 
           { bomb: _bomb }
           )
+        if (bomb.isDestroyed) {
+          _bomb.setDestroyed()
+        }
       } else {
         const _bomb = this.bombs.get(bomb.id).bomb
         _bomb.setX(bomb.x)

@@ -24,7 +24,6 @@ export default class Powerup extends Phaser.Physics.Arcade.Sprite {
     switch (String(this.powerupType)) {
       case 'bomb_normal':
         avatar.increaseMaxBombs()
-        console.log('test')
         break
       case 'bomb_super':
         avatar.increaseMaxBombs(10)
