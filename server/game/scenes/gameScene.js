@@ -141,19 +141,17 @@ export class GameScene extends Scene {
 
     this.io.onConnection(channel => {
       channel.onDisconnect(() => {
-        console.log('Disconnect user ' + channel.id)
-        this.playersGroup.children.each(player => {
-          if (player.playerId === channel.playerId) {
-            player.kill()
-          }
-        })
+        const player = this.players.get(channel.id).avatar
+        player.kill()
         channel.room.emit('removePlayer', channel.playerId)
       })
 
 
       channel.on('getId', () => {
-        channel.playerId = this.getId()
-        channel.emit('getId', channel.playerId.toString(36))
+        if (this.players.size < 4) {
+          channel.playerId = this.getId()
+          channel.emit('getId', channel.playerId.toString(36))
+        }
       })
 
       channel.on('addPlayer', data => {

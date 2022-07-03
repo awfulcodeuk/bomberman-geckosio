@@ -6,7 +6,7 @@ const SI = new SnapshotInterpolation(15) // 15 FPS
 
 const playerVault = new Vault()
 
-import FullscreenButton from '../components/fullscreenButton.js'
+//import FullscreenButton from '../components/fullscreenButton.js'
 
 // imports for components
 import Player from '../components/Player.js'
@@ -102,12 +102,26 @@ export default class GameScene extends Scene {
 
     this.add.sprite(0,0,'background').setScale(2)
 
-    this.voteButton = this.add.sprite(927,790,'ui_button').setInteractive()
-    this.text = this.add.bitmapText(897, 770, 'atari', 'Vote').setFontSize(12)
-    this.text = this.add.bitmapText(867, 790, 'atari', '(Re)start').setFontSize(12)
+    this.voteButton = this.add.sprite(927, 40,'ui_button').setInteractive()
+    this.add.bitmapText(897, 20, 'atari', 'Vote').setFontSize(12)
+    this.add.bitmapText(867, 40, 'atari', '(Re)start').setFontSize(12)
     
     this.voteButton.on('pointerup', () => {
       this.channel.emit('voteButton')
+    })
+
+    this.voteText = new Map()
+    this.voteText.set(1, {
+      voteStatusButton: this.add.bitmapText(870, 80, 'atari', '1').setFontSize(24).setTint(0x000000)
+    })
+    this.voteText.set(2, {
+      voteStatusButton: this.add.bitmapText(900, 80, 'atari', '2').setFontSize(24).setTint(0x000000)
+    })
+    this.voteText.set(3, {
+      voteStatusButton: this.add.bitmapText(930, 80, 'atari', '3').setFontSize(24).setTint(0x000000)
+    })
+    this.voteText.set(4, {
+      voteStatusButton: this.add.bitmapText(960, 80, 'atari', '4').setFontSize(24).setTint(0x000000)
     })
 
     this.channel.on('snapshot', snapshot => {
@@ -122,22 +136,22 @@ export default class GameScene extends Scene {
 
     this.physics.add.overlap(this.physicsAvatars, this.physicsBombs)
 
-    FullscreenButton(this)
+    //FullscreenButton(this)
 
     this.channel.emit('getId')
     
     this.channel.on('getId', playerId36 => {
-      this.playerId = parseInt(playerId36, 36)
-      this.channel.emit('addPlayer')
+        this.playerId = parseInt(playerId36, 36)
+        this.channel.emit('addPlayer') 
     })
 
     this.channel.on('removePlayer', playerId => {
-      try {
-        this.objects[playerId].sprite.destroy()
-        delete this.objects[playerId]
-      } catch (error) {
-        console.error(error.message)
-      }
+      //try {
+      //  this.objects[playerId].sprite.destroy()
+      //  delete this.objects[playerId]
+      //} catch (error) {
+      //  console.error(error.message)
+      //}
     })
 
     const bgmMusic = this.sound.add('stage_01_bgm')
@@ -241,6 +255,7 @@ export default class GameScene extends Scene {
         _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
         _avatar.speed = avatar.speed
         this.avatars.set(avatar.id, { avatar: _avatar })
+        this.voteText.get(avatar.playerNumber).voteStatusButton.setTint(0x444444)
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar
