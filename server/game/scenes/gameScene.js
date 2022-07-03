@@ -216,7 +216,7 @@ export class GameScene extends Scene {
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
-      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, isDead: avatar.isDead})
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, speed: avatar.speed, isDead: avatar.isDead})
     })
 
     // get an array of all blocks

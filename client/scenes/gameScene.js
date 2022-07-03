@@ -36,9 +36,12 @@ export default class GameScene extends Scene {
   preload() {
     this.load.image('background', '../assets/stage_01_background.png')
 
+    this.load.bitmapFont('atari', 'assets/fonts/atari-smooth.png', 'assets/fonts/atari-smooth.xml')
+
     this.load.image('edge_block', '../assets/stage_01_edge_block.png')
     this.load.image('static_block', '../assets/stage_01_static_block.png')
     this.load.image('breakable_block', '../assets/stage_01_breakable_block.png')
+    this.load.image('ui_button', '../assets/ui_button.png')
 
     this.load.atlas('player_1', '../assets/players_01.png', '../assets/players_01_atlas.json')
     this.load.atlas('player_2', '../assets/players_02.png', '../assets/players_02_atlas.json')
@@ -99,6 +102,10 @@ export default class GameScene extends Scene {
 
     this.add.sprite(0,0,'background').setScale(2)
 
+    this.add.sprite(927,790,'ui_button')
+    this.text = this.add.bitmapText(897, 770, 'atari', 'Vote').setFontSize(12)
+    this.text = this.add.bitmapText(867, 790, 'atari', '(Re)start').setFontSize(12)
+    
     this.channel.on('snapshot', snapshot => {
       SI.snapshot.add(snapshot)
     })
@@ -106,7 +113,7 @@ export default class GameScene extends Scene {
     this.input.mouse.disableContextMenu()
 
     
-    this.physics.add.collider(this.physicsAvatars,this.physicsBlocks)
+    this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
     this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
 
     this.physics.add.overlap(this.physicsAvatars, this.physicsBombs)
@@ -228,6 +235,7 @@ export default class GameScene extends Scene {
         _avatar.setX(avatar.x)
         _avatar.setY(avatar.y)
         _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
+        _avatar.speed = avatar.speed
         this.avatars.set(avatar.id, { avatar: _avatar })
       } else {
         //if (avatar.id != this.socket.id) {
@@ -239,6 +247,7 @@ export default class GameScene extends Scene {
             _avatar.setX(avatar.x)
             _avatar.setY(avatar.y)
             _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
+            _avatar.speed = avatar.speed
             _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
           }
         //}
@@ -268,7 +277,7 @@ export default class GameScene extends Scene {
   
 serverReconciliation = (movement) => {
   const { left, up, right, down } = movement
-  const player = this.avatars.get(this.socket.id).avatar
+  const player = this.avatars.get(this.channel.id).avatar
 
   if (player) {
     // get the latest snapshot from the server
@@ -279,7 +288,7 @@ serverReconciliation = (movement) => {
 
     if (serverSnapshot && playerSnapshot) {
       // get the current player position on the server
-      const serverPos = serverSnapshot.state.players.filter(s => s.id === this.socket.id)[0]
+      const serverPos = serverSnapshot.state.players.filter(s => s.id === this.channel.id)[0]
       
       // calculate the offset between server and client
       const offsetX = playerSnapshot.state[0].x - serverPos.x
@@ -300,8 +309,8 @@ serverReconciliation = (movement) => {
 
 clientPrediction = (movement) => {
   const { left, up, right, down } = movement
-  const speed = 80
-  const player = this.avatars.get(this.socket.id).avatar
+  const player = this.avatars.get(this.channel.id).avatar
+  const speed = player.speed
 
   if (player) {
     if (movement.left) player.setVelocityX(-speed)
@@ -311,9 +320,8 @@ clientPrediction = (movement) => {
     else if (movement.down) player.setVelocityY(speed)
     else player.setVelocityY(0)
     playerVault.add(
-      SI.snapshot.create([{ id: this.socket.id, x: player.x, y: player.y }])
+      SI.snapshot.create([{ id: this.channel.id, x: player.x, y: player.y }])
     ) 
-    this.playerAnimation(player)
   }
 }
 }
