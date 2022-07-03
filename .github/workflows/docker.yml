@@ -26,6 +26,8 @@ jobs:
         with:
           context: .
           push: true
+          cache-from: type=local,src=/tmp/.buildx-main-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-main-cache
           tags: localhost:5000/bman-geckosio/bman:latest
       -
         name: Inspect
