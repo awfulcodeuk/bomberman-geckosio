@@ -102,10 +102,14 @@ export default class GameScene extends Scene {
 
     this.add.sprite(0,0,'background').setScale(2)
 
-    this.add.sprite(927,790,'ui_button')
+    this.voteButton = this.add.sprite(927,790,'ui_button').setInteractive()
     this.text = this.add.bitmapText(897, 770, 'atari', 'Vote').setFontSize(12)
     this.text = this.add.bitmapText(867, 790, 'atari', '(Re)start').setFontSize(12)
     
+    this.voteButton.on('pointerup', () => {
+      this.channel.emit('voteButton')
+    })
+
     this.channel.on('snapshot', snapshot => {
       SI.snapshot.add(snapshot)
     })
