@@ -4,8 +4,6 @@ RUN curl -sL https://unpkg.com/@pnpm/self-installer | node
 
 # use node user instead of root
 WORKDIR /app
-RUN chown node:node ./
-USER node
 
 # copy both 'package.json'
 COPY package.json ./
