@@ -1,5 +1,4 @@
 import geckos from '@geckos.io/server'
-import { iceServers } from '@geckos.io/server'
 
 import pkg from 'phaser'
 const { Scene } = pkg
@@ -27,6 +26,27 @@ import Powerup from '../components/Powerup.js'
 // imports for stages // blah
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
 const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
+
+const iceServers = [
+  {
+    urls: "stun:openrelay.metered.ca:80",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  }
+]
 
 export class GameScene extends Scene {
   constructor() {
