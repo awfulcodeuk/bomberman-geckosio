@@ -95,6 +95,8 @@ export default class GameScene extends Scene {
 
     this.bombKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
 
+    this.playerIsAlive = true
+
     this.add.sprite(0,0,'background').setScale(2)
 
     this.channel.on('snapshot', snapshot => {
@@ -215,8 +217,8 @@ export default class GameScene extends Scene {
       up: this.cursors.up.isDown,
       down: this.cursors.down.isDown
     }
-    
-    this.channel.emit('playerMove', movement)
+
+    if (this.playerIsAlive) this.channel.emit('playerMove', movement)
 
     state.forEach(avatar => {
       const exists = this.avatars.has(avatar.id)
@@ -232,6 +234,7 @@ export default class GameScene extends Scene {
           const _avatar = this.avatars.get(avatar.id).avatar
           if (avatar.isDead && !_avatar.isDead) {
             _avatar.kill()
+            if (avatar.id == this.channel.id) this.playerIsAlive = false
           } else if (!avatar.isDead) {
             _avatar.setX(avatar.x)
             _avatar.setY(avatar.y)
@@ -256,7 +259,7 @@ export default class GameScene extends Scene {
 
     //this.serverReconciliation(movement)
 
-    if (this.bombKey.isDown && !this.bombCoolDown) {
+    if (this.bombKey.isDown && !this.bombCoolDown && this.playerIsAlive) {
       this.bombCoolDown = true
       this.channel.emit('dropBomb')
       setTimeout(() => this.bombCoolDown = false, 250)
