@@ -26,8 +26,8 @@ COPY . .
 RUN npm run build
 
 # set environment to be production
-ARG NODE_ENV=production
-ENV NODE_ENV $NODE_ENV
+#ARG NODE_ENV=production
+#ENV NODE_ENV $NODE_ENV
 
 RUN ls -al /app
 
