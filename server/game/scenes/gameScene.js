@@ -69,7 +69,7 @@ export class GameScene extends Scene {
       iceServers: iceServers,
       portRange: {
         min: 27900,
-        max: 27920
+        max: 27910
       }
     })
     this.io.addServer(this.game.server)
