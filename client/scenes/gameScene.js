@@ -161,7 +161,7 @@ export default class GameScene extends Scene {
     const bgmMusic = this.sound.add('stage_01_bgm', {volume: 0.5})
 
     bgmMusic.play()
-
+    
   }
 
   update() {
@@ -170,6 +170,7 @@ export default class GameScene extends Scene {
       this.add.bitmapText(90, 100, 'atari', 'There are already ' + playerCount + ' players.').setFontSize(16)
       this.add.bitmapText(90, 150, 'atari', 'Try refreshing the page in a short while.').setFontSize(16)
     })
+    
     const snap = SI.calcInterpolation('x y', 'players')
     const blockSnap = SI.calcInterpolation('x y', 'blocks')
     const bombSnap = SI.calcInterpolation('x y', 'bombs')
@@ -218,6 +219,11 @@ export default class GameScene extends Scene {
         const _bomb = this.bombs.get(bomb.id).bomb
         _bomb.setX(bomb.x)
         _bomb.setY(bomb.y)
+        if (bomb.isKicked && !_bomb.isKicked) {
+          const kickSound = this.sound.add('kick')
+          kickSound.play()      
+        }
+        _bomb.isKicked = bomb.isKicked
         if (bomb.isDestroyed) {
           _bomb.setDestroyed()
         }

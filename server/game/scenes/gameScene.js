@@ -127,6 +127,7 @@ export class GameScene extends Scene {
   }
 
   create() {
+    this.soundEventKick = false
     this.playersGroup = this.add.group()
     this.physics.world.setBounds(64, 64, 704, 768)
     // create physics groups
@@ -136,7 +137,28 @@ export class GameScene extends Scene {
     this.physicsPowerups = this.physics.add.group()
     this.explosionColliders = this.physics.add.staticGroup()
     this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
-    this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
+    this.physics.add.collider(this.physicsBombs, this.physicsBlocks, function(_bomb, _block) {
+      _bomb.setVelocityX(0)
+      _bomb.setVelocityY(0)
+      _bomb.x = Math.floor(_bomb.x / 64) * 64 + 32
+      _bomb.y = Math.floor(_bomb.y / 64) * 64 + 32
+    })
+    this.physics.add.collider(this.physicsAvatars, this.physicsBombs, function(_avatar, _bomb) {
+      if (_avatar.hasKick) {
+        if (_avatar.body.touching.up && _bomb.body.touching.down && !_bomb.isKicked) {
+          _bomb.kick('up')
+        }
+        if (_avatar.body.touching.down && _bomb.body.touching.up && !_bomb.isKicked) {
+          _bomb.kick('down')
+        }
+        if (_avatar.body.touching.left && _bomb.body.touching.right && !_bomb.isKicked) {
+          _bomb.kick('left')
+        }
+        if (_avatar.body.touching.right && _bomb.body.touching.left && !_bomb.isKicked) {
+          _bomb.kick('right')
+        }
+      }
+    })
     this.physics.add.overlap(this.physicsAvatars, this.physicsPowerups, function(collectingAvatar,powerUpEntity) {
       //console.log(collectingAvatar)
       //console.log(powerUpEntity)
@@ -250,7 +272,7 @@ export class GameScene extends Scene {
     const bombsArr = []
     this.bombs.forEach(bomb => {
       const { bombID, bombEntity } = bomb
-      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isDestroyed: bombEntity.isDestroyed, isConfirmedReal: bombEntity.isConfirmedReal })
+      bombsArr.push({ id: bombID, x: bombEntity.x, y: bombEntity.y, isDestroyed: bombEntity.isDestroyed, isKicked: bombEntity.isKicked, isConfirmedReal: bombEntity.isConfirmedReal })
     })
 
     // get an array of all explosions

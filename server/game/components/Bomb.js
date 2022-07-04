@@ -13,20 +13,43 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     scene.physicsBombs.add(this)
     this.body.setSize(64, 64)
     this.body.setImmovable()
+    this.body.setBounce(0)
+    this.body.setCollideWorldBounds()
 
     this.entityID = entityID
     this.bombID = bombID
     this.owningPlayer = owningPlayer
     this.bombRange = this.owningPlayer.bombRange
     this.isDestroyed = isDestroyed
+    this.isKicked = false
     this.lifetimeExplosionCount = this.scene.lifetimeExplosionCount
     this.entitiesToHit = new Map()
     this.avatarsToHit = new Map()
     this.blocksToHit = new Map()
     this.bombsToHit = new Map()
     // use this for triggering the explosion
-    this.bombCountdown = this.scene.time.delayedCall(3500, this.explode, [], this)
+    this.bombCountdown = this.scene.time.delayedCall(3750, this.explode, [], this)
   }
+
+  kick(direction) {
+    if (!this.isKicked) {
+      this.isKicked = true
+      if (direction === 'up') {
+        this.setVelocityY(-180)
+      }
+      if (direction === 'down') {
+        this.setVelocityY(180)
+      }
+      if (direction === 'left') {
+        this.setVelocityX(-180)
+      }
+      if (direction === 'right') {
+        this.setVelocityX(180)
+      }
+      this.scene.soundEventKick = true
+    }
+  }
+
 
   hitWithExplosion() {
     this.explode()

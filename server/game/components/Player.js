@@ -22,13 +22,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.maxBombs = 1
     this.currentLaidBombs = 0
 
-    this.speed = 80
+    this.speed = 90
 
     this.isDead = false
 
     this.playerID = playerID
     this.isConnected = true
     this.isVoting = false
+
+    this.hasGlove = false
+    this.hasKick = false
     
     this.move = {}
     this.animFrame = 'p' + this.playerID + '_stand'
@@ -88,21 +91,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   increaseSpeed() {
-    this.speed = this.speed + 10
-    if (this.speed > 160) this.speed = 160
+    this.speed = this.speed + 15
+    if (this.speed > 160) this.speed = 180
   }
 
   decreaseSpeed() {
-    this.speed = this.speed - 10
+    this.speed = this.speed - 20
     if (this.speed < 40) this.speed = 40
   }
 
   giveGlove() {
-    console.log('got glove')
+    this.hasGlove = true
   }
   
   giveKick() {
-    console.log('got kick')
+    this.hasKick = true
   }
 
   giveSkull() {

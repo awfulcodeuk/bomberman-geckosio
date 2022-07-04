@@ -26,8 +26,8 @@
     "24": ["skates"],
     "25": ["skates"],
     "26": ["skates"],
-    "27": ["glove"],
-    "28": ["glove"],
+    "27": ["bomb_normal"],
+    "28": ["bomb_normal"],
     "29": ["kick"],
     "30": ["kick"],
     "31": ["skull"],
@@ -50,5 +50,7 @@
     "48": ["skull"],
     "49": ["skull"],
     "50": ["skull"],
-    "51": ["skull"]
+    "51": ["skull"],
+    "52": ["kick"],
+    "53": ["kick"]
 }
