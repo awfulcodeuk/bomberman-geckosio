@@ -124,8 +124,8 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
         // hit entity if it is not beyond the blockage point
         
         this.entitiesToHit.forEach((entity) => {
-          const horizontalDifference = Math.floor((entity.hitEntity.x - this.x) / 64)
-          const verticalDifference = Math.floor((entity.hitEntity.y - this.y) / 64)
+          const horizontalDifference = Math.round((entity.hitEntity.x - this.x) / 64)
+          const verticalDifference = Math.round((entity.hitEntity.y - this.y) / 64)
           //console.log('horizontal: ' + horizontalDifference + ' vert: ' + verticalDifference)
           let explosionBlocked = false
           if (horizontalDifference > 0) {
