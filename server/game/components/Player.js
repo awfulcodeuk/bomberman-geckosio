@@ -27,6 +27,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isDead = false
 
     this.playerID = playerID
+    this.isConnected = true
+    this.isVoting = false
     
     this.move = {}
     this.animFrame = 'p' + this.playerID + '_stand'

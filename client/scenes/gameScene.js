@@ -154,6 +154,9 @@ export default class GameScene extends Scene {
       //}
     })
 
+    this.channel.on('successful_vote', () => {
+      console.log('voted')
+    })
     const bgmMusic = this.sound.add('stage_01_bgm')
 
     bgmMusic.play()
@@ -255,7 +258,6 @@ export default class GameScene extends Scene {
         _avatar.setData({playerAnimFrame: avatar.playerAnimFrame})
         _avatar.speed = avatar.speed
         this.avatars.set(avatar.id, { avatar: _avatar })
-        this.voteText.get(avatar.playerNumber).voteStatusButton.setTint(0x444444)
       } else {
         //if (avatar.id != this.socket.id) {
           const _avatar = this.avatars.get(avatar.id).avatar
@@ -269,6 +271,14 @@ export default class GameScene extends Scene {
             _avatar.speed = avatar.speed
             _avatar.anims.play(_avatar.getData('playerAnimFrame'),true)
           }
+          _avatar.isConnected = avatar.isConnected
+          _avatar.isVoting = avatar.isVoting
+          if (!_avatar.isVoting) {
+            this.voteText.get(avatar.playerNumber).voteStatusButton.setTint(0x444444)
+          } else {
+            this.voteText.get(avatar.playerNumber).voteStatusButton.setTint(0xFFFFFF)
+          }
+          if (!_avatar.isConnected) this.voteText.get(avatar.playerNumber).voteStatusButton.setTint(0x000000)
         //}
       }
     })

@@ -142,6 +142,7 @@ export class GameScene extends Scene {
     this.io.onConnection(channel => {
       channel.onDisconnect(() => {
         const player = this.players.get(channel.id).avatar
+        player.isConnected = false
         player.kill()
         channel.room.emit('removePlayer', channel.playerId)
       })
@@ -169,6 +170,10 @@ export class GameScene extends Scene {
 
       channel.on('playerMove', data => {
         this.players.get(channel.id).avatar.setMove(data)
+      })
+
+      channel.on('voteButton', () => {
+        this.players.get(channel.id).avatar.isVoting = !this.players.get(channel.id).avatar.isVoting
       })
 
       channel.on('dropBomb', dropBomb => {
@@ -211,10 +216,12 @@ export class GameScene extends Scene {
     if (this.tick % 4 !== 0) return
 
     // get an array of all avatars
+    let voteOutcome = true
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
-      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, speed: avatar.speed, isDead: avatar.isDead})
+      avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, isConnected: avatar.isConnected, isVoting: avatar.isVoting, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, speed: avatar.speed, isDead: avatar.isDead})
+      if (avatar.isConnected && !avatar.isVoting) voteOutcome = false
     })
 
     // get an array of all blocks
@@ -260,6 +267,10 @@ export class GameScene extends Scene {
     this.players.forEach(player => {
       const { channel } = player
       channel.emit('snapshot', snapshot)
+      if (voteOutcome) {
+        player.avatar.isVoting = false
+        channel.emit('successful_vote')
+      }
     })
 
   }
