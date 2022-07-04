@@ -12,7 +12,7 @@ export default class Block extends Phaser.Physics.Arcade.Sprite {
 
     scene.add.existing(this)
     scene.physicsBlocks.add(this)
-    this.body.setSize(64,64)
+    this.body.setSize(60,64)
     this.setImmovable()
 
   }

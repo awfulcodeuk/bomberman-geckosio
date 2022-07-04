@@ -157,7 +157,7 @@ export default class GameScene extends Scene {
     this.channel.on('successful_vote', () => {
       location.reload()
     })
-    const bgmMusic = this.sound.add('stage_01_bgm')
+    const bgmMusic = this.sound.add('stage_01_bgm', {volume: 0.5})
 
     bgmMusic.play()
 

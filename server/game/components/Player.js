@@ -106,6 +106,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   giveSkull() {
-    console.log('got skull')
+    const skullRandomChoice = Math.random()
+    if (skullRandomChoice < 0.33) {
+      this.decreaseMaxBombs()
+    } else if (skullRandomChoice < 0.66) {
+      this.decreaseBombRange()
+    } else {
+      this.decreaseSpeed()
+    }
   }
 }

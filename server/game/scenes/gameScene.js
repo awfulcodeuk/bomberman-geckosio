@@ -25,7 +25,8 @@ import Powerup from '../components/Powerup.js'
 
 // imports for stages // blah
 const stageBlocks = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-blocks.json', 'utf8')))
-const stagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
+const initialStagePowerupPool = Object.values(JSON.parse(fs.readFileSync(__dirname + '/../stages/01-power-ups.json', 'utf8')))
+let stagePowerupPool = initialStagePowerupPool
 
 const iceServers = [
   {
@@ -347,6 +348,8 @@ export class GameScene extends Scene {
     this.spawnLocations = []
     this.globalEntityID = 0
     
+    stagePowerupPool = initialStagePowerupPool
+
     this.spawnStage()
     
     this.isResetting = false
