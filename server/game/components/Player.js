@@ -40,7 +40,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.processingDamage) {
       this.processingDamage = true
       this.kill()
-      console.log('killed: ' + this.playerID)
     }
   }
 
@@ -108,32 +107,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   giveSkull() {
     console.log('got skull')
-  }
-
-  update() {
-    if (this.move.left) this.setVelocityX(-this.speed)
-    else if (this.move.right) this.setVelocityX(this.speed)
-    else this.setVelocityX(0)
-
-    if (this.move.up) this.setVelocityY(-this.speed)
-    else if (this.move.down) this.setVelocityY(this.speed)
-    else this.setVelocityY(0)          
-    
-    const playerPrefix = 'p' + this.playerID
-    
-    let playerAnimFrame = ''
-    if (this.body.velocity.y <  0 ) { 
-      playerAnimFrame = playerPrefix + '_walk_up'
-    } else if (this.body.velocity.y >  0 ) {
-      playerAnimFrame = playerPrefix + '_walk_down'
-    } else if (this.body.velocity.x <  0 ) {
-      playerAnimFrame = playerPrefix + '_walk_left'
-    } else if (this.body.velocity.x >  0 ) {
-      playerAnimFrame = playerPrefix + '_walk_right'
-    } else {
-      playerAnimFrame = playerPrefix + '_stand'
-    }
-    
-    this.setAnimFrame(playerAnimFrame)
   }
 }

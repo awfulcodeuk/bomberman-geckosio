@@ -51,6 +51,7 @@ const iceServers = [
 export class GameScene extends Scene {
   constructor() {
     super({ key: 'GameScene' })
+    this.isResetting = false
     this.playerId = 0
     this.tick = 0
     this.blockIDCounter = 0
@@ -98,23 +99,7 @@ export class GameScene extends Scene {
     }
   }
 
-  create() {
-    this.playersGroup = this.add.group()
-    this.physics.world.setBounds(64, 64, 704, 768)
-    // create physics groups
-    this.physicsBlocks = this.physics.add.staticGroup()
-    this.physicsAvatars = this.physics.add.group()
-    this.physicsBombs = this.physics.add.group()
-    this.physicsPowerups = this.physics.add.group()
-    this.explosionColliders = this.physics.add.staticGroup()
-    this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
-    this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
-    this.physics.add.overlap(this.physicsAvatars, this.physicsPowerups, function(collectingAvatar,powerUpEntity) {
-      //console.log(collectingAvatar)
-      //console.log(powerUpEntity)
-      // give the power up to the player and destroy the entity
-      powerUpEntity.processPickupByAvatar(collectingAvatar)
-    }, false, this)
+  spawnStage() {
     // create stage
     let rowCount = 0
     let colCount = 0
@@ -138,13 +123,38 @@ export class GameScene extends Scene {
       colCount = 0
       rowCount++
     })
+  }
+
+  create() {
+    this.playersGroup = this.add.group()
+    this.physics.world.setBounds(64, 64, 704, 768)
+    // create physics groups
+    this.physicsBlocks = this.physics.add.staticGroup()
+    this.physicsAvatars = this.physics.add.group()
+    this.physicsBombs = this.physics.add.group()
+    this.physicsPowerups = this.physics.add.group()
+    this.explosionColliders = this.physics.add.staticGroup()
+    this.physics.add.collider(this.physicsAvatars, this.physicsBlocks)
+    this.physics.add.collider(this.physicsAvatars, this.physicsBombs)
+    this.physics.add.overlap(this.physicsAvatars, this.physicsPowerups, function(collectingAvatar,powerUpEntity) {
+      //console.log(collectingAvatar)
+      //console.log(powerUpEntity)
+      // give the power up to the player and destroy the entity
+      powerUpEntity.processPickupByAvatar(collectingAvatar)
+    }, false, this)
+
+    this.spawnStage()
 
     this.io.onConnection(channel => {
       channel.onDisconnect(() => {
-        const player = this.players.get(channel.id).avatar
-        player.isConnected = false
-        player.kill()
-        channel.room.emit('removePlayer', channel.playerId)
+        if (!this.isResetting) {
+          if (this.players.has(channel.id)) {
+            const player = this.players.get(channel.id).avatar
+            player.isConnected = false
+            player.kill()
+            channel.emit('removePlayer', channel.playerId)
+          }
+        }
       })
 
 
@@ -152,6 +162,8 @@ export class GameScene extends Scene {
         if (this.players.size < 4) {
           channel.playerId = this.getId()
           channel.emit('getId', channel.playerId.toString(36))
+        } else {
+          channel.emit('too_many_players', this.players.size)
         }
       })
 
@@ -169,7 +181,7 @@ export class GameScene extends Scene {
       })
 
       channel.on('playerMove', data => {
-        this.players.get(channel.id).avatar.setMove(data)
+        if (this.players.has(channel.id)) this.players.get(channel.id).avatar.setMove(data)
       })
 
       channel.on('voteButton', () => {
@@ -217,9 +229,11 @@ export class GameScene extends Scene {
 
     // get an array of all avatars
     let voteOutcome = true
+    if (this.playerId < 1) voteOutcome = false
     const avatars = []
     this.players.forEach(player => {
       const { channel, avatar } = player
+      this.updatePlayer(avatar)
       avatars.push({ id: channel.id, x: avatar.x, y: avatar.y, playerNumber: avatar.playerID, isConnected: avatar.isConnected, isVoting: avatar.isVoting, playerAnimFrame: avatar.animFrame, bombRange: avatar.bombRange, maxBombs: avatar.maxBombs, speed: avatar.speed, isDead: avatar.isDead})
       if (avatar.isConnected && !avatar.isVoting) voteOutcome = false
     })
@@ -273,11 +287,68 @@ export class GameScene extends Scene {
       }
     })
 
+    if (voteOutcome) this.resetGame()
   }
   
-   getNewEntityID() {
+  getNewEntityID() {
     return this.globalEntityID++
   }
 
+  updatePlayer(player) {
+    if (player.move.left) player.setVelocityX(-player.speed)
+    else if (player.move.right) player.setVelocityX(player.speed)
+    else player.setVelocityX(0)
 
+    if (player.move.up) player.setVelocityY(-player.speed)
+    else if (player.move.down) player.setVelocityY(player.speed)
+    else player.setVelocityY(0)          
+    
+    const playerPrefix = 'p' + player.playerID
+    
+    let playerAnimFrame = ''
+    if (player.body.velocity.y <  0 ) { 
+      playerAnimFrame = playerPrefix + '_walk_up'
+    } else if (player.body.velocity.y >  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_down'
+    } else if (player.body.velocity.x <  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_left'
+    } else if (player.body.velocity.x >  0 ) {
+      playerAnimFrame = playerPrefix + '_walk_right'
+    } else {
+      playerAnimFrame = playerPrefix + '_stand'
+    }
+    
+    player.setAnimFrame(playerAnimFrame)
+  }
+
+  resetGame() {
+    this.isResetting = true
+    this.playerId = 0
+    this.tick = 0
+    this.blockIDCounter = 0
+    this.players.forEach(player => {
+      player.avatar.destroy()
+    })
+    this.players.clear()
+    this.blocks.forEach(block => {
+      block.blockEntity.destroy()
+    })
+    this.blocks.clear()
+    this.bombs.forEach(bomb => {
+      bomb.bombEntity.destroy()
+    })
+    this.bombs.clear()
+    this.powerups.forEach(powerup => {
+      powerup.powerupEntity.destroy()
+    })
+    this.powerups.clear()
+    this.explosions.clear()
+    this.lifetimeExplosionCount = 0
+    this.spawnLocations = []
+    this.globalEntityID = 0
+    
+    this.spawnStage()
+    
+    this.isResetting = false
+  }
 }

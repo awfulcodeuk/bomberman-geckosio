@@ -155,7 +155,7 @@ export default class GameScene extends Scene {
     })
 
     this.channel.on('successful_vote', () => {
-      console.log('voted')
+      location.reload()
     })
     const bgmMusic = this.sound.add('stage_01_bgm')
 
@@ -164,8 +164,10 @@ export default class GameScene extends Scene {
   }
 
   update() {
-    this.channel.on('tooManyPlayers', playerCount => {
+    this.channel.on('too_many_players', playerCount => {
       console.log('Too many players already: ' + playerCount)
+      this.add.bitmapText(90, 100, 'atari', 'There are already ' + playerCount + ' players.').setFontSize(16)
+      this.add.bitmapText(90, 150, 'atari', 'Try refreshing the page in a short while.').setFontSize(16)
     })
     const snap = SI.calcInterpolation('x y', 'players')
     const blockSnap = SI.calcInterpolation('x y', 'blocks')
