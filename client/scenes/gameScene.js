@@ -84,6 +84,7 @@ export default class GameScene extends Scene {
     this.load.audio('kick', '../assets/audio/effects/kick.mp3')
     this.load.audio('kick_voice', '../assets/audio/effects/kick_voice.mp3')
     this.load.audio('item_get', '../assets/audio/effects/item_get.mp3')
+    this.load.audio('skull', '../assets/audio/effects/skull.mp3')
   }
 
   create() {
